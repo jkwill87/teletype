@@ -3,21 +3,16 @@
 from __future__ import print_function
 
 from ..codes import escape_sequences
-from ..exceptions import (
-    TeletypeQuitException,
-    TeletypeSkipException,
-    TeletypeException,
-)
+from ..exceptions import TeletypeQuitException
 from ..io import (
-    erase_lines,
     erase_screen,
     get_key,
     move_cursor,
     show_cursor,
-    strip_format,
     style_format,
     style_print,
 )
+from .config import get_glyph
 
 _chars = {
     "cursor": style_format(u"❯", "magenta"),

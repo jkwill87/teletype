@@ -1,11 +1,12 @@
 from __future__ import print_function
 
+import sys
 from curses import setupterm, tigetstr
 from re import sub
 from sys import stdin
 from termios import TCSADRAIN, tcgetattr, tcsetattr
 from tty import setraw
-import sys
+
 from .. import codes
 
 setupterm()

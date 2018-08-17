@@ -2,28 +2,9 @@
 
 from __future__ import print_function
 
-from ..codes import escape_sequences
-from ..exceptions import (
-    TeletypeException,
-    TeletypeQuitException,
-    TeletypeSkipException,
-)
-from ..io import (
-    erase_lines,
-    erase_screen,
-    get_key,
-    move_cursor,
-    show_cursor,
-    strip_format,
-    style_format,
-    style_print,
-)
-
-_chars = {
-    "cursor": style_format(u"❯", "magenta"),
-    "filled": style_format(u"⦿", "green"),
-    "unfilled": u"○",
-}
+from ..exceptions import TeletypeException
+from ..io import show_cursor, strip_format, style_format
+from .config import get_glyph
 
 
 class ProgressBar:

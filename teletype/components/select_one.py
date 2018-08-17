@@ -3,13 +3,8 @@
 from __future__ import print_function
 
 from ..codes import escape_sequences
-from ..exceptions import (
-    TeletypeQuitException,
-    TeletypeSkipException,
-    TeletypeException,
-)
+from ..exceptions import TeletypeQuitException, TeletypeSkipException
 from ..io import (
-    erase_lines,
     erase_screen,
     get_key,
     move_cursor,
@@ -18,12 +13,8 @@ from ..io import (
     style_format,
     style_print,
 )
+from .config import get_glyph
 
-_chars = {
-    "cursor": style_format(u"❯", "magenta"),
-    "filled": style_format(u"⦿", "green"),
-    "unfilled": u"○",
-}
 
 
 class SelectOne:
