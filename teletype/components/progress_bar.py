@@ -27,20 +27,17 @@ class ProgressBar:
         print()
 
     def update(self, step, steps):
+        g_edge = get_glyph("edge")
+        g_block = get_glyph("block")
         prefix = ""
         if self.header:
             prefix += "%s: " % style_format(self.header, "bold")
         format_specifier = "%%0%dd" % len(str(steps))
         prefix += "%s/%d " % (format_specifier % step, steps)
-        prefix += style_format("|", ("magenta", "bold"))
+        prefix += g_edge
         percent = step / steps * 100
-        suffix = style_format("|", ("magenta", "bold")) + " %03d%%" % percent
+        suffix = g_edge + " %03d%%" % percent
         units_total = max(self.width - len(strip_format(prefix + suffix)), 5)
         units = units_total * step // steps
-        line = (
-            prefix
-            + units * style_format(u"█", "green")
-            + (units_total - units) * " "
-            + suffix
-        )
+        line = prefix + units * g_block + (units_total - units) * " " + suffix
         print("\r%s" % line, end="")

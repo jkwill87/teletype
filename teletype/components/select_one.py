@@ -16,7 +16,6 @@ from ..io import (
 from .config import get_glyph
 
 
-
 class SelectOne:
     def __init__(self, choices, header="", **options):
         self._line = 0
@@ -41,6 +40,7 @@ class SelectOne:
             self.show_quit = False
 
     def prompt(self):
+        g_cursor = get_glyph("arrow")
         if not self.choices:
             return
         show_cursor(False)
@@ -49,7 +49,7 @@ class SelectOne:
         if self.header:
             style_print(self.header, style="bold")
         for i, choice in enumerate(self.choices):
-            print(" %s %s" % (_chars["cursor"] if i == 0 else " ", choice))
+            print(" %s %s" % (g_cursor if i == 0 else " ", choice))
         move_cursor(rows=-1 * i - 1)
         while True:
             key = get_key()
@@ -74,13 +74,14 @@ class SelectOne:
         return self.selected
 
     def _move_line(self, distance):
+        g_cursor = get_glyph("arrow")
         offset = (self._line + distance) % len(self.choices) - self._line
         if offset == 0:
             return
         self._line += offset
         print("  ", end="")
         move_cursor(rows=offset, cols=-2)
-        print(" %s" % _chars["cursor"], end="")
+        print(" %s" % g_cursor, end="")
         move_cursor(cols=-2)
 
     @property
@@ -89,4 +90,3 @@ class SelectOne:
         if isinstance(choice, str):
             choice = strip_format(choice)
         return choice
-

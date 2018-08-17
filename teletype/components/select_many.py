@@ -14,12 +14,6 @@ from ..io import (
 )
 from .config import get_glyph
 
-_chars = {
-    "cursor": style_format(u"❯", "magenta"),
-    "filled": style_format(u"⦿", "green"),
-    "unfilled": u"○",
-}
-
 
 class SelectMany:
     def __init__(self, choices, header="", **options):
@@ -36,6 +30,8 @@ class SelectMany:
         self.erase_screen = options.get("erase_screen") is True
 
     def prompt(self):
+        g_arrow = get_glyph("arrow")
+        g_unselected = get_glyph("unselected")
         if not self.choices:
             return
         show_cursor(False)
@@ -44,10 +40,7 @@ class SelectMany:
         if self.header:
             style_print(self.header, style="bold")
         for i, choice in enumerate(self.choices):
-            print(
-                "%s%s %s "
-                % (" " if i else _chars["cursor"], _chars["unfilled"], choice)
-            )
+            print("%s%s %s " % (" " if i else g_arrow, g_unselected, choice))
         move_cursor(rows=-1 * i - 1)
         while True:
             key = get_key()
@@ -70,24 +63,23 @@ class SelectMany:
         return self.selected
 
     def _move_line(self, distance):
+        g_arrow = get_glyph("arrow")
         offset = (self._line + distance) % len(self.choices) - self._line
         if offset == 0:
             return
         self._line += offset
         print(" ", end="")
         move_cursor(rows=offset, cols=-1)
-        print("%s" % _chars["cursor"], end="")
+        print("%s" % g_arrow, end="")
         move_cursor(cols=-1)
 
     def _select_line(self):
         self._selected_lines ^= {self._line}
         move_cursor(cols=1)
-        print(
-            _chars[
-                "filled" if self._line in self._selected_lines else "unfilled"
-            ],
-            end="",
+        glyph = get_glyph(
+            "selected" if self._line in self._selected_lines else "unselected"
         )
+        print(glyph, end="")
         move_cursor(cols=-2)
 
     @property
@@ -96,4 +88,3 @@ class SelectMany:
             self.choices[line % len(self.choices)]
             for line in self._selected_lines
         ]
-
