@@ -1,7 +1,5 @@
 # coding=utf-8
 
-from __future__ import unicode_literals
-
 from ..io import style_format as _style_format
 
 # These variables control module internal state; please do not modify directly
@@ -10,9 +8,9 @@ _ascii_mode = False
 _primary_style = ("green",)
 _secondary_style = ("yellow", "bold")
 _chars = {
-    "primary": {"selected": "⦿", "block": "█"},
-    "secondary": {"arrow": "❯", "edge": "|"},
-    "plain": {"unselected": "○"},
+    "primary": {"selected": u"⦿", "block": u"█"},
+    "secondary": {"arrow": u"❯", "edge": "|"},
+    "plain": {"unselected": u"○"},
 }
 
 
