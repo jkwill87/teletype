@@ -7,8 +7,8 @@ from ..io import style_format as _style_format
 # These variables control module internal state; please do not modify directly
 _backups = ()
 _ascii_mode = False
-_primary_style = ("blue",)
-_secondary_style = ("magenta", "bold")
+_primary_style = ("green",)
+_secondary_style = ("yellow", "bold")
 _chars = {
     "primary": {"selected": "⦿", "block": "█"},
     "secondary": {"arrow": "❯", "edge": "|"},
