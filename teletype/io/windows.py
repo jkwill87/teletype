@@ -2,7 +2,7 @@ from msvcrt import getch, kbhit  # pylint: disable=E0401
 
 from colorama import colorama_text
 
-from teletype.codes import scan_codes, keys_flipped
+from ..codes import scan_codes, keys_flipped
 
 
 def get_key(raw=False):

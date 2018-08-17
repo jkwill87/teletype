@@ -6,7 +6,7 @@ from sys import stdin
 from termios import TCSADRAIN, tcgetattr, tcsetattr
 from tty import setraw
 import sys
-from teletype import codes
+from .. import codes
 
 setupterm()
 
