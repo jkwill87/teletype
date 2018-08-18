@@ -9,7 +9,7 @@ _primary_style = ("green",)
 _secondary_style = ("green", "dark")
 _chars = {
     "primary": {"selected": u"●", "block": u"█"},
-    "secondary": {"arrow": u"❯", "edge": "|"},
+    "secondary": {"arrow": u"❱", "left-edge": u"▐", "right-edge": u"▌"},
     "plain": {"unselected": u"○"},
 }
 
@@ -62,7 +62,7 @@ def ascii_mode(enabled=True):
         _backups = _chars.copy(), _primary_style, _secondary_style
         _chars = {
             "primary": {"selected": "*", "block": "#"},
-            "secondary": {"arrow": ">", "edge": "|"},
+            "secondary": {"arrow": ">", "left-edge": "|", "right-edge": "|"},
             "plain": {"unselected": "."},
         }
         _primary_style = ()
