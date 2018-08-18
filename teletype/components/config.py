@@ -8,7 +8,7 @@ _ascii_mode = False
 _primary_style = ("green",)
 _secondary_style = ("yellow", "bold")
 _chars = {
-    "primary": {"selected": u"⦿", "block": u"█"},
+    "primary": {"selected": u"●", "block": u"█"},
     "secondary": {"arrow": u"❯", "edge": "|"},
     "plain": {"unselected": u"○"},
 }
