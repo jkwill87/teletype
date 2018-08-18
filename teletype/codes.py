@@ -61,10 +61,12 @@ highlights = {
 
 modes = {
     "blink": "\033\x5b5m",
-    "bold": "\033\x5b1m",
+    "bold": "\033\x5b1m",  # aka increased intensity
     "concealed": "\033\x5b8m",
     "dark": "\033\x5b2m",
+    "italic": "\033\x5b3m",  # not widely supported
     "reversed": "\033\x5b7m",
+    "strikeout": "\033\x5b9m",
     "underline": "\033\x5b4m",
 }
 
