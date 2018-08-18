@@ -11,7 +11,7 @@ from .. import codes
 
 setupterm()
 
-posix_term_codes = {
+_posix_term_codes = {
     direction: sub(r"\$<\d+>[/*]?", "", (tigetstr(descriptor) or b"").decode())
     for direction, descriptor in (
         ("up", "cuu1"),
@@ -53,25 +53,27 @@ def move_cursor(cols=0, rows=0):
     if cols == 0 and rows == 0:
         return
     commands = ""
-    commands += posix_term_codes["up" if rows < 0 else "down"] * abs(rows)
-    commands += posix_term_codes["left" if cols < 0 else "right"] * abs(cols)
+    commands += _posix_term_codes["up" if rows < 0 else "down"] * abs(rows)
+    commands += _posix_term_codes["left" if cols < 0 else "right"] * abs(cols)
     if commands:
         print(commands, end="")
         sys.stdout.flush()
 
 
 def show_cursor(visible=True):
-    print(posix_term_codes["show_cursor" if visible else "hide_cursor"], end="")
+    print(
+        _posix_term_codes["show_cursor" if visible else "hide_cursor"], end=""
+    )
 
 
 def erase_lines(n=1):
     for _ in range(n):
-        print(posix_term_codes["up"], end="")
-        print(posix_term_codes["eol"], end="")
+        print(_posix_term_codes["up"], end="")
+        print(_posix_term_codes["eol"], end="")
 
 
 def erase_screen():
-    print(posix_term_codes["clear_screen"], end="")
+    print(_posix_term_codes["clear_screen"], end="")
 
 
 def strip_format(text):
