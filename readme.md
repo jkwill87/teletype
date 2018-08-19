@@ -74,7 +74,7 @@ from teletype.components import SelectOne
 picker = SelectOne(
     header="Your Favourite Animal?",
     choices=["dog", "bird", "cat", "monkey", "gorilla"],
-)
+) 
 choice = picker.prompt()
 print("Your choice: " + choice)
 ```
@@ -137,10 +137,6 @@ ProgressBar(width=50).process(iterable)
 
 print("Select Many", style="underline")
 SelectMany(choices).prompt()
-
-print("Select One", style="underline")
-set_char("arrow", u"🐙")
-SelectOne(choices).prompt()
 ```
 
 ![Output](https://github.com/jkwill87/teletype/blob/master/_assets/demo_style.png)
