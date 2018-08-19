@@ -15,8 +15,6 @@
 
 You can read keystrokes from stdin using `get_key`. Regular keys get returned as a string with a single character, e.g. `"a"`, `"1"`, `"&"`, etc., while special keys and key combinations are returned as a string description, e.g. `"space"`, `"f12"`, `"page-up"`, `"ctrl-c"`, etc. A listing of the supported key combinations are listed in the [`codes`](https://github.com/jkwill87/teletype/blob/master/teletype/codes/common.py) module.
 
-**Example:**
-
 ```python
 from teletype.io import get_key
 
@@ -40,8 +38,6 @@ You can style strings with colours and effects using `style_format`. Styles can 
 Alternatively you can you just pass these same parameters to `style_print` and accomplish this in one fell swoop. `style_print` takes the same parameters as the regular print function and can be used in place. In python3 you can even import style_print as print and use it in place. In order to pull this compatibility off for python2, the `style` argument must be specified explitly when calling, however, e.g. `style_print("yolo", style="yellow")`.
 
 Lastly, you can use `strip_format` to clear a string of any escape sequences that have been previously applied.
-
-**Example:**
 
 ```python
 from teletype.io import style_format, style_print, sstrip_format
@@ -69,8 +65,6 @@ The package also includes components, higher level UI classes that are composed 
 
 ## SelectOne
 
-**Example:**
-
 ```python
 from teletype.components import SelectOne
 
@@ -84,8 +78,6 @@ print("Your choice: " + choice)
 
 ![Output](https://github.com/jkwill87/teletype/blob/master/_assets/demo_select_one.gif)
 ## SelectMany
-
-**Example:**
 
 ```python
 from teletype.components import SelectMany
@@ -101,8 +93,6 @@ print("Your choices: " + ", ".join(choices))
 ![Output](https://github.com/jkwill87/teletype/blob/master/_assets/demo_select_many.gif)
 
 ## ProgressBar
-
-**Example:**
 
 ```python
 from time import sleep
@@ -123,8 +113,6 @@ ProgressBar().process(iterable(), iterations)
 ## Styling Components (teletype.components.config)
 
 You can set component primary and secondary styles using `set_style` and change characters using `set_char`.
-
-**Example:**
 
 ```python
 from teletype.io import style_print as print
