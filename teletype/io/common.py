@@ -26,8 +26,12 @@ def move_cursor(cols=0, rows=0):
         stdout.flush()
 
 
-def show_cursor(visible=True):
-    print(codes.cursor["show" if visible else "hide"], end="")
+def show_cursor():
+    print(codes.cursor["show"], end="")
+
+
+def hide_cursor():
+    print(codes.cursor["hide"], end="")
 
 
 def strip_format(text):

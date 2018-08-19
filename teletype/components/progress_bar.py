@@ -3,7 +3,7 @@
 from __future__ import print_function
 
 from ..exceptions import TeletypeException
-from ..io import show_cursor, strip_format, style_format
+from ..io import hide_cursor, show_cursor, strip_format, style_format
 from .config import get_glyph
 
 
@@ -17,13 +17,13 @@ class ProgressBar:
             steps = iterations or len(iterable)
         except AttributeError:
             raise TeletypeException("Unable to determine range")
-        show_cursor(False)
+        hide_cursor()
         self.update(0, steps)
         skip_count = max(steps // 1000, 1)
         for step, _ in enumerate(iterable, 1):
             if step % skip_count == 0 or step == steps:
                 self.update(step, steps)
-        show_cursor(True)
+        show_cursor()
         print()
 
     def update(self, step, steps):

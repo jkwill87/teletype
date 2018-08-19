@@ -7,6 +7,7 @@ from ..exceptions import TeletypeQuitException
 from ..io import (
     erase_screen,
     get_key,
+    hide_cursor,
     move_cursor,
     show_cursor,
     style_format,
@@ -34,7 +35,7 @@ class SelectMany:
         g_unselected = get_glyph("unselected")
         if not self.choices:
             return
-        show_cursor(False)
+        hide_cursor()
         if self.erase_screen:
             erase_screen()
         if self.header:
@@ -49,17 +50,17 @@ class SelectMany:
             elif key in {"down", "j"}:
                 self._move_line(1)
             elif key in {"ctrl-c", "ctrl-d", "ctrl-z"} | escape_sequences:
-                show_cursor(True)
+                show_cursor()
                 raise TeletypeQuitException
             elif key == "space":
                 self._select_line()
-            elif key == "lf":
+            elif key in ("lf", "nl"):
                 break
         if self.erase_screen:
             erase_screen()
         else:
             move_cursor(rows=len(self.choices) - self._line + 1)
-        show_cursor(True)
+        show_cursor()
         return self.selected
 
     def _move_line(self, distance):
