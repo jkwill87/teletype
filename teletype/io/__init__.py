@@ -1,8 +1,7 @@
-from os import name
-
+from .. import IS_WINDOWS
 from .common import *
 
-if name in ("nt", "cygwin"):
+if IS_WINDOWS:
     from .windows import *
 else:
-    from .unix import *
+    from .posix import *
