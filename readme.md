@@ -79,8 +79,7 @@ choice = picker.prompt()
 print("Your choice: " + choice)
 ```
 
-![Output](https://github.com/jkwill87/mnamer/blob/_assets/demo_select_one.gif)
-
+![Output](https://github.com/jkwill87/teletype/blob/master/_assets/demo_select_one.gif)
 ## SelectMany
 
 **Example:**
@@ -96,7 +95,7 @@ choices = picker.prompt()
 print("Your choices: " + ", ".join(choices))
 ```
 
-![Output](https://github.com/jkwill87/mnamer/blob/_assets/demo_select_many.gif)
+![Output](https://github.com/jkwill87/teletype/blob/master/_assets/demo_select_many.gif)
 
 ## ProgressBar
 
@@ -116,7 +115,7 @@ def iterable():
 ProgressBar().process(iterable(), iterations)
 ```
 
-![Output](https://github.com/jkwill87/mnamer/blob/_assets/demo_progress_bar.gif)
+![Output](https://github.com/jkwill87/teletype/blob/master/_assets/demo_progress_bar.gif)
 
 ## Styling Components (teletype.components.config)
 
@@ -144,7 +143,7 @@ set_char("arrow", u"🐙")
 SelectOne(choices).prompt()
 ```
 
-![Output](https://github.com/jkwill87/mnamer/blob/_assets/demo_style.png)
+![Output](https://github.com/jkwill87/teletype/blob/master/_assets/demo_style.png)
 
 ## License
 
