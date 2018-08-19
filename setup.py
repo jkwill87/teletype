@@ -14,7 +14,6 @@ setup(
     author_email="jessy@jessywilliams.com",
     description="A high-level cross platform tty library",
     include_package_data=True,
-    install_requires=["colorama"] if name in ("nt", "cygwin") else [],
     license="MIT",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
