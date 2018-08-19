@@ -18,6 +18,7 @@ def _get_char_category(key):
 def set_style(primary=None, secondary=None):
     """
     """
+    global _primary_style, _secondary_style
     if primary:
         _primary_style = primary
     if secondary:
@@ -27,6 +28,7 @@ def set_style(primary=None, secondary=None):
 def set_char(key, value):
     """
     """
+    global _chars
     category = _get_char_category(key)
     if not category:
         raise KeyError
