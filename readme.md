@@ -1,6 +1,9 @@
+[![pypi](https://img.shields.io/pypi/v/teletype.svg?style=for-the-badge)](https://pypi.python.org/pypi/teletype)
+[![licence](https://img.shields.io/github/license/jkwill87/teletype.svg?style=for-the-badge)](https://en.wikipedia.org/wiki/MIT_License)
+
 # teletype
 
-`teletype` is a high-level cross platform Python tty library. It provides a consistent interface between the terminal and cmd.exe by building on top of [terminfo](https://invisible-island.net/ncurses/terminfo.src.html) and [msvcrt](https://msdn.microsoft.com/en-us/library/abx4dbyh.aspx) and has no dependancies.
+**teletype** is a high-level cross platform tty library compatible with Python 2.7 and 3+. It provides a consistent interface between the terminal and cmd.exe by building on top of [terminfo](https://invisible-island.net/ncurses/terminfo.src.html) and [msvcrt](https://msdn.microsoft.com/en-us/library/abx4dbyh.aspx) and has no dependancies.
 
 # Installation
 
