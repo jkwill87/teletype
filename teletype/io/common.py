@@ -42,7 +42,7 @@ def style_format(text, style):
     if not style:
         return text
     if isinstance(style, str):
-        style = (style,)
+        style = style.split(" ")
     prefix = ""
     for s in style:
         prefix += codes.colours.get(s, "")
