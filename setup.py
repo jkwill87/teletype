@@ -2,7 +2,7 @@
 
 from os import name
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 from teletype import VERSION
 
@@ -18,7 +18,7 @@ setup(
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     name="teletype",
-    packages=["teletype"],
+    packages=find_packages(),
     url="https://github.com/jkwill87/teletype",
     version=VERSION,
 )
