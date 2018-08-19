@@ -15,29 +15,7 @@ def _get_char_category(key):
             return category
 
 
-def set_style(primary=None, secondary=None):
-    """
-    """
-    global _primary_style, _secondary_style
-    if primary:
-        _primary_style = primary
-    if secondary:
-        _secondary_style = secondary
-
-
-def set_char(key, value):
-    """
-    """
-    global _chars
-    category = _get_char_category(key)
-    if not category:
-        raise KeyError
-    _chars[category][key] = value
-
-
-def get_glyph(key):
-    """
-    """
+def _get_glyph(key):
     category = _get_char_category(key)
     if not category:
         raise KeyError
@@ -49,8 +27,28 @@ def get_glyph(key):
     return glyph
 
 
-def ascii_mode(enabled=True):
+def set_style(primary=None, secondary=None):
+    """ Sets primary and secondary component styles.
     """
+    global _primary_style, _secondary_style
+    if primary:
+        _primary_style = primary
+    if secondary:
+        _secondary_style = secondary
+
+
+def set_char(key, value):
+    """ Updates charters used to render components.
+    """
+    global _chars
+    category = _get_char_category(key)
+    if not category:
+        raise KeyError
+    _chars[category][key] = value
+
+
+def ascii_mode(enabled=True):
+    """ Disables color and switches to an ASCII character set if True.
     """
     global _backups, _chars, _primary_style, _secondary_style, _ascii_mode
     if not (enabled or _backups) or (enabled and _ascii_mode):

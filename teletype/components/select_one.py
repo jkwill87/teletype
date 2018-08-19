@@ -14,7 +14,7 @@ from ..io import (
     style_format,
     style_print,
 )
-from .config import get_glyph
+from .config import _get_glyph
 
 
 class SelectOne:
@@ -41,7 +41,7 @@ class SelectOne:
             self.show_quit = False
 
     def prompt(self):
-        g_cursor = get_glyph("arrow")
+        g_cursor = _get_glyph("arrow")
         if not self.choices:
             return
         hide_cursor()
@@ -76,7 +76,7 @@ class SelectOne:
         return self.selected
 
     def _move_line(self, distance):
-        g_cursor = get_glyph("arrow")
+        g_cursor = _get_glyph("arrow")
         offset = (self._line + distance) % len(self.choices) - self._line
         if offset == 0:
             return

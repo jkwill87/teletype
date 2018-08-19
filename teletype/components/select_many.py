@@ -13,7 +13,7 @@ from ..io import (
     style_format,
     style_print,
 )
-from .config import get_glyph
+from .config import _get_glyph
 
 
 class SelectMany:
@@ -31,8 +31,8 @@ class SelectMany:
         self.erase_screen = options.get("erase_screen") is True
 
     def prompt(self):
-        g_arrow = get_glyph("arrow")
-        g_unselected = get_glyph("unselected")
+        g_arrow = _get_glyph("arrow")
+        g_unselected = _get_glyph("unselected")
         if not self.choices:
             return
         hide_cursor()
@@ -65,7 +65,7 @@ class SelectMany:
         return self.selected
 
     def _move_line(self, distance):
-        g_arrow = get_glyph("arrow")
+        g_arrow = _get_glyph("arrow")
         offset = (self._line + distance) % len(self.choices) - self._line
         if offset == 0:
             return
@@ -78,7 +78,7 @@ class SelectMany:
     def _select_line(self):
         self._selected_lines ^= {self._line}
         move_cursor(cols=1)
-        glyph = get_glyph(
+        glyph = _get_glyph(
             "selected" if self._line in self._selected_lines else "unselected"
         )
         print(glyph, end="")

@@ -4,7 +4,7 @@ from __future__ import print_function
 
 from ..exceptions import TeletypeException
 from ..io import hide_cursor, show_cursor, strip_format, style_format
-from .config import get_glyph
+from .config import _get_glyph
 
 
 class ProgressBar:
@@ -27,9 +27,9 @@ class ProgressBar:
         print("\n")
 
     def update(self, step, steps):
-        g_block = get_glyph("block")
-        g_l_edge = get_glyph("left-edge")
-        g_r_edge = get_glyph("right-edge")
+        g_block = _get_glyph("block")
+        g_l_edge = _get_glyph("left-edge")
+        g_r_edge = _get_glyph("right-edge")
         prefix = ""
         if self.header:
             prefix += "%s: " % style_format(self.header, "bold")

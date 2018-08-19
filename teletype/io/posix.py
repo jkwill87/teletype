@@ -10,6 +10,8 @@ from .. import codes
 
 
 def get_key(raw=False):
+    """ Gets a single key from stdin
+    """
     file_descriptor = stdin.fileno()
     state = tcgetattr(file_descriptor)
     chars = []

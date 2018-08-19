@@ -77,6 +77,7 @@ print("Your choice: " + choice)
 ```
 
 ![Output](https://github.com/jkwill87/teletype/blob/master/_assets/demo_select_one.gif)
+
 ## SelectMany
 
 ```python

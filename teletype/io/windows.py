@@ -4,6 +4,8 @@ from ..codes import keys_flipped, scan_codes
 
 
 def get_key(raw=False):
+    """ Gets a single key from stdin
+    """
     while True:
         try:
             if kbhit():
