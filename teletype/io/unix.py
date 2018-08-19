@@ -1,10 +1,10 @@
 from __future__ import print_function
 
 import sys
-from curses import setupterm, tigetstr
+from curses import setupterm, tigetstr  # pylint: disable=E0401,E0611
 from re import sub
 from sys import stdin
-from termios import TCSADRAIN, tcgetattr, tcsetattr
+from termios import TCSADRAIN, tcgetattr, tcsetattr  # pylint: disable=E0401
 from tty import setraw
 
 from .. import codes
