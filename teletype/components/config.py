@@ -1,17 +1,12 @@
-# coding=utf-8
-
 from ..io import style_format as _style_format
+from ..codes import chars
 
 # These variables control module internal state; please do not modify directly
 _backups = ()
 _ascii_mode = False
 _primary_style = ("green",)
 _secondary_style = ("green", "dark")
-_chars = {
-    "primary": {"selected": u"●", "block": u"█"},
-    "secondary": {"arrow": u"❱", "left-edge": u"▐", "right-edge": u"▌"},
-    "plain": {"unselected": u"○"},
-}
+_chars = chars.copy()
 
 
 def _get_char_category(key):

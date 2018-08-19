@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from ctypes import windll
 
 # Allows Windows 10 Anniversary (build>=16257) to use VT100 Codes
@@ -29,4 +31,10 @@ scan_codes = {
     21472: "\x1b[3~",
     22272: "\x1bO23~",
     34528: "\x1bO24~",
+}
+
+chars = {
+    "primary": {"selected": u"●", "block": u"█"},
+    "secondary": {"arrow": u"►", "left-edge": u"▐", "right-edge": u"▌"},
+    "plain": {"unselected": u"○"},
 }
