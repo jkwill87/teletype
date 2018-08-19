@@ -1,30 +1,12 @@
 from __future__ import print_function
 
 import sys
-from curses import setupterm, tigetstr  # pylint: disable=E0401,E0611
 from re import sub
 from sys import stdin
 from termios import TCSADRAIN, tcgetattr, tcsetattr  # pylint: disable=E0401
 from tty import setraw
 
 from .. import codes
-
-setupterm()
-
-_posix_term_codes = {
-    direction: sub(r"\$<\d+>[/*]?", "", (tigetstr(descriptor) or b"").decode())
-    for direction, descriptor in (
-        ("up", "cuu1"),
-        ("down", "cud1"),
-        ("left", "cub1"),
-        ("right", "cuf1"),
-        ("bol", "el1"),
-        ("eol", "el"),
-        ("clear_screen", "clear"),
-        ("hide_cursor", "civis"),
-        ("show_cursor", "cnorm"),
-    )
-}
 
 
 def get_key(raw=False):
@@ -47,34 +29,3 @@ def get_key(raw=False):
         tcsetattr(file_descriptor, TCSADRAIN, state)
     result = "".join(chars)
     return result if raw else codes.keys_flipped.get(result, result)
-
-
-def move_cursor(cols=0, rows=0):
-    if cols == 0 and rows == 0:
-        return
-    commands = ""
-    commands += _posix_term_codes["up" if rows < 0 else "down"] * abs(rows)
-    commands += _posix_term_codes["left" if cols < 0 else "right"] * abs(cols)
-    if commands:
-        print(commands, end="")
-        sys.stdout.flush()
-
-
-def show_cursor(visible=True):
-    print(
-        _posix_term_codes["show_cursor" if visible else "hide_cursor"], end=""
-    )
-
-
-def erase_lines(n=1):
-    for _ in range(n):
-        print(_posix_term_codes["up"], end="")
-        print(_posix_term_codes["eol"], end="")
-
-
-def erase_screen():
-    print(_posix_term_codes["clear_screen"], end="")
-
-
-def strip_format(text):
-    return sub(r"(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]", "", text)
