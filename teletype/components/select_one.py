@@ -72,6 +72,7 @@ class SelectOne:
             raise TeletypeQuitException
         elif self.show_skip and self.selected == "[SKIP]":
             raise TeletypeSkipException
+        print()
         return self.selected
 
     def _move_line(self, distance):

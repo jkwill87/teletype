@@ -61,6 +61,7 @@ class SelectMany:
         else:
             move_cursor(rows=len(self.choices) - self._line + 1)
         show_cursor()
+        print()
         return self.selected
 
     def _move_line(self, distance):

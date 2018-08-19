@@ -24,7 +24,7 @@ class ProgressBar:
             if step % skip_count == 0 or step == steps:
                 self.update(step, steps)
         show_cursor()
-        print()
+        print("\n")
 
     def update(self, step, steps):
         g_block = get_glyph("block")
