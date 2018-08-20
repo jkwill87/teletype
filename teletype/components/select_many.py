@@ -59,9 +59,8 @@ class SelectMany:
         if self.erase_screen:
             erase_screen()
         else:
-            move_cursor(rows=len(self.choices) - self._line + 1)
+            move_cursor(rows=len(self.choices) - self._line)
         show_cursor()
-        print()
         return self.selected
 
     def _move_line(self, distance):

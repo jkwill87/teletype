@@ -76,13 +76,12 @@ class SelectOne:
         if self.erase_screen:
             erase_screen()
         else:
-            move_cursor(rows=len(self.choices) - self._line + 1)
+            move_cursor(rows=len(self.choices) - self._line)
         show_cursor()
         if self.allow_quit and self.selected == "[q]uit":
             raise TeletypeQuitException
         elif self.allow_skip and self.selected == "[s]kip":
             raise TeletypeSkipException
-        print()
         return self.selected
 
     def _move_line(self, distance):
