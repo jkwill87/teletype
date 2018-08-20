@@ -1,7 +1,5 @@
 from __future__ import print_function
 
-import sys
-from re import sub
 from sys import stdin
 from termios import TCSADRAIN, tcgetattr, tcsetattr  # pylint: disable=E0401
 from tty import setraw

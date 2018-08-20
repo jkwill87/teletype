@@ -10,7 +10,6 @@ from ..io import (
     hide_cursor,
     move_cursor,
     show_cursor,
-    style_format,
     style_print,
 )
 from .config import _get_glyph
