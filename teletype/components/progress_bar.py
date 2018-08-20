@@ -2,15 +2,25 @@
 
 from __future__ import print_function
 
+import os
+
 from ..exceptions import TeletypeException
 from ..io import hide_cursor, show_cursor, strip_format, style_format
 from .config import _get_glyph
 
 
 class ProgressBar:
-    def __init__(self, width=80, header=""):
+    def __init__(self, width=None, header=""):
         self.width = width
         self.header = header
+        if width:
+            self.width = width
+        else:
+            try:
+                # Python 3.3+ only
+                self.width, _ = os.get_terminal_size()
+            except:
+                self.width = 80
 
     def process(self, iterable, iterations=None):
         try:
