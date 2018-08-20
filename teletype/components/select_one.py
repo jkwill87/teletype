@@ -29,16 +29,16 @@ class SelectOne:
         ]
         self.header = header
         self.erase_screen = options.get("erase_screen") is True
-        if options.get("show_skip") is True:
-            self.show_skip = True
-            self.choices.append(style_format("[SKIP]", "dark"))
+        if options.get("allow_skip") is True:
+            self.allow_skip = True
+            self.choices.append(style_format("[s]kip", "dark"))
         else:
-            self.show_skip = False
-        if options.get("show_quit") is True:
-            self.show_quit = True
-            self.choices.append(style_format("[QUIT]", "dark"))
+            self.allow_skip = False
+        if options.get("allow_quit") is True:
+            self.allow_quit = True
+            self.choices.append(style_format("[q]uit", "dark"))
         else:
-            self.show_quit = False
+            self.allow_quit = False
 
     def prompt(self):
         g_cursor = _get_glyph("arrow")
@@ -61,6 +61,16 @@ class SelectOne:
             elif key in {"ctrl-c", "ctrl-d", "ctrl-z"} | escape_sequences:
                 show_cursor()
                 raise TeletypeQuitException
+            elif key == "s" and self.allow_skip:
+                distance = len(self.choices) - self._line - 1
+                if self.allow_quit:
+                    distance -= 1
+                if not self._move_line(distance):
+                    break
+            elif key == "q" and self.allow_quit:
+                distance = len(self.choices) - self._line - 1
+                if not self._move_line(distance):
+                    break
             elif key in ("lf", "nl"):
                 break
         if self.erase_screen:
@@ -68,9 +78,9 @@ class SelectOne:
         else:
             move_cursor(rows=len(self.choices) - self._line + 1)
         show_cursor()
-        if self.show_quit and self.selected == "[QUIT]":
+        if self.allow_quit and self.selected == "[q]uit":
             raise TeletypeQuitException
-        elif self.show_skip and self.selected == "[SKIP]":
+        elif self.allow_skip and self.selected == "[s]kip":
             raise TeletypeSkipException
         print()
         return self.selected
@@ -79,12 +89,13 @@ class SelectOne:
         g_cursor = _get_glyph("arrow")
         offset = (self._line + distance) % len(self.choices) - self._line
         if offset == 0:
-            return
+            return 0
         self._line += offset
         print("  ", end="")
         move_cursor(rows=offset, cols=-2)
         print(" %s" % g_cursor, end="")
         move_cursor(cols=-2)
+        return offset
 
     @property
     def selected(self):
