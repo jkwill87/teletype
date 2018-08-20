@@ -71,12 +71,12 @@ from teletype.components import SelectOne
 picker = SelectOne(
     header="Your Favourite Animal?",
     choices=["dog", "bird", "cat", "monkey", "gorilla"],
-) 
+)
 choice = picker.prompt()
 print("Your choice: " + choice)
 ```
 
-![Output](https://github.com/jkwill87/teletype/blob/master/_assets/demo_select_one.gif)
+![Output](https://github.com/jkwill87/teletype/blob/master/_assets/select_one.gif)
 
 ## SelectMany
 
@@ -91,7 +91,7 @@ choices = picker.prompt()
 print("Your choices: " + ", ".join(choices))
 ```
 
-![Output](https://github.com/jkwill87/teletype/blob/master/_assets/demo_select_many.gif)
+![Output](https://github.com/jkwill87/teletype/blob/master/_assets/select_many.gif)
 
 ## ProgressBar
 
@@ -109,7 +109,7 @@ def iterable():
 ProgressBar().process(iterable(), iterations)
 ```
 
-![Output](https://github.com/jkwill87/teletype/blob/master/_assets/demo_progress_bar.gif)
+![Output](https://github.com/jkwill87/teletype/blob/master/_assets/progress_bar.gif)
 
 ## Styling Components (teletype.components.config)
 
@@ -131,7 +131,7 @@ print("Select Many", style="underline")
 SelectMany(choices).prompt()
 ```
 
-![Output](https://github.com/jkwill87/teletype/blob/master/_assets/demo_style.png)
+![Output](https://github.com/jkwill87/teletype/blob/master/_assets/style.png)
 
 ## License
 
