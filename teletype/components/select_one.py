@@ -29,16 +29,16 @@ class SelectOne:
         ]
         self.header = header
         self.erase_screen = options.get("erase_screen") is True
-        if options.get("allow_skip") is True:
-            self.allow_skip = True
+        if options.get("skip") is True:
+            self.skip = True
             self.choices.append(style_format("[s]kip", "dark"))
         else:
-            self.allow_skip = False
-        if options.get("allow_quit") is True:
-            self.allow_quit = True
+            self.skip = False
+        if options.get("quit") is True:
+            self.quit = True
             self.choices.append(style_format("[q]uit", "dark"))
         else:
-            self.allow_quit = False
+            self.quit = False
 
     def prompt(self):
         g_cursor = _get_glyph("arrow")
@@ -61,13 +61,13 @@ class SelectOne:
             elif key in {"ctrl-c", "ctrl-d", "ctrl-z"} | escape_sequences:
                 show_cursor()
                 raise TeletypeQuitException
-            elif key == "s" and self.allow_skip:
+            elif key == "s" and self.skip:
                 distance = len(self.choices) - self._line - 1
-                if self.allow_quit:
+                if self.quit:
                     distance -= 1
                 if not self._move_line(distance):
                     break
-            elif key == "q" and self.allow_quit:
+            elif key == "q" and self.quit:
                 distance = len(self.choices) - self._line - 1
                 if not self._move_line(distance):
                     break
@@ -78,9 +78,9 @@ class SelectOne:
         else:
             move_cursor(rows=len(self.choices) - self._line)
         show_cursor()
-        if self.allow_quit and self.selected == "[q]uit":
+        if self.quit and self.selected == "[q]uit":
             raise TeletypeQuitException
-        elif self.allow_skip and self.selected == "[s]kip":
+        elif self.skip and self.selected == "[s]kip":
             raise TeletypeSkipException
         return self.selected
 
