@@ -1,5 +1,6 @@
 [![pypi](https://img.shields.io/pypi/v/teletype.svg?style=for-the-badge)](https://pypi.python.org/pypi/teletype)
 [![licence](https://img.shields.io/github/license/jkwill87/teletype.svg?style=for-the-badge)](https://en.wikipedia.org/wiki/MIT_License)
+[![code style black](https://img.shields.io/badge/Code%20Style-Black-black.svg?style=for-the-badge)](https://github.com/ambv/black)
 
 # teletype
 
