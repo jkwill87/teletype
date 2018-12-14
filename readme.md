@@ -114,11 +114,11 @@ ProgressBar().process(iterable(), iterations)
 
 ## Styling Components (teletype.components.config)
 
-You can set component primary and secondary styles using `set_style` and change characters using `set_char`.
+You can set component primary and secondary styles using `set_style`.
 
 ```python
 from teletype.io import style_print as print
-from teletype.components.config import set_style, set_char
+from teletype.components.config import set_style
 from teletype.components import ProgressBar, SelectMany, SelectOne
 
 set_style(primary="yellow", secondary="magenta")
@@ -134,6 +134,17 @@ SelectMany(choices).prompt()
 
 ![Output](https://github.com/jkwill87/teletype/blob/master/_assets/style.png)
 
-## License
+You can also change character sets using `set_char(key, value)` where value is the unicode character you want to use and key is one of:
+
+- selected
+- unselected
+- arrow
+- block
+- left-edge
+- right-edge
+
+Lastly, you can also use **ascii_mode(enabled=True)** to quickly disable colour stylings and swap to a ascii-only character set.
+
+# License
 
 MIT. See license.txt for details.
