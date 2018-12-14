@@ -41,6 +41,7 @@ class SelectOne:
             self.quit = False
 
     def prompt(self):
+        self._line = 0
         g_cursor = _get_glyph("arrow")
         if not self.choices:
             return

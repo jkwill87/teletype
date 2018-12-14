@@ -30,6 +30,8 @@ class SelectMany:
         self.erase_screen = options.get("erase_screen") is True
 
     def prompt(self):
+        self._line = 0
+        self._selected_lines = set()
         g_arrow = _get_glyph("arrow")
         g_unselected = _get_glyph("unselected")
         if not self.choices:
