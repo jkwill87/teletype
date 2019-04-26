@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 
+from teletype.io import erase_lines
 from ..codes import escape_sequences
 from ..exceptions import TeletypeQuitException, TeletypeSkipException
 from ..io import (
@@ -60,6 +61,7 @@ class SelectOne:
             elif key in {"down", "j"}:
                 self._move_line(1)
             elif key in {"ctrl-c", "ctrl-d", "ctrl-z"} | escape_sequences:
+                move_cursor(0, len(self.choices) - self._line)
                 show_cursor()
                 raise TeletypeQuitException
             elif key == "s" and self.skip:

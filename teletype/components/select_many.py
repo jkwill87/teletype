@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 
+from teletype.io import erase_lines
 from ..codes import escape_sequences
 from ..exceptions import TeletypeQuitException
 from ..io import (
@@ -52,6 +53,7 @@ class SelectMany:
                 self._move_line(1)
             elif key in {"ctrl-c", "ctrl-d", "ctrl-z"} | escape_sequences:
                 show_cursor()
+                move_cursor(0, len(self.choices) - self._line)
                 raise TeletypeQuitException
             elif key == "space":
                 self._select_line()
