@@ -1,5 +1,9 @@
-from os import name as _name
+# coding=utf-8
 
-VERSION = "0.2.2"
+from os import name as os_name
 
-IS_WINDOWS = _name in ("nt", "cygwin")
+__all__ = ["VERSION", "IS_WINDOWS"]
+
+VERSION = "0.3"
+
+IS_WINDOWS = os_name in ("nt", "cygwin")
