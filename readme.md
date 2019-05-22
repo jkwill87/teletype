@@ -142,8 +142,6 @@ You can also change character sets using `set_char(key, value)` where value is t
 - left-edge
 - right-edge
 
-Lastly, you can also use **ascii_mode(enabled=True)** to quickly disable colour stylings and swap to a ascii-only character set.
-
 
 # License
 
