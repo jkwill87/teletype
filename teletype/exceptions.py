@@ -1,10 +1,13 @@
 class TeletypeException(Exception):
-    pass
+    """ Base exception for teletype; raised when an internal preconditon fails
+    """
 
 
 class TeletypeSkipException(TeletypeException):
-    pass
+    """ Raised when a user selects skip as an option from a select component
+    """
 
 
 class TeletypeQuitException(TeletypeException):
-    pass
+    """ Raised when a user selects quit as an option from a select component
+    """
