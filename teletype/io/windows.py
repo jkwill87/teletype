@@ -1,6 +1,8 @@
+# coding=utf-8
+
 from msvcrt import getch, kbhit  # pylint: disable=E0401
 
-from ..codes import keys_flipped, scan_codes
+from teletype.codes import KEYS_FLIPPED, SCAN_CODES
 
 
 def get_key(raw=False):

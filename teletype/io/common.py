@@ -1,8 +1,21 @@
+# coding=utf-8
+
 from __future__ import print_function
 
 from re import sub
 from sys import stdout
-from .. import codes
+from teletype import codes
+
+__all__ = [
+    "erase_lines",
+    "erase_screen",
+    "move_cursor",
+    "show_cursor",
+    "hide_cursor",
+    "strip_format",
+    "style_format",
+    "style_print",
+]
 
 
 def erase_lines(n=1):

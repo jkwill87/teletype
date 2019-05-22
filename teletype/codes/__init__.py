@@ -1,7 +1,7 @@
-from .. import IS_WINDOWS
-from .common import *
+from teletype import IS_WINDOWS
+from teletype.codes.common import *
 
 if IS_WINDOWS:
-    from .windows import *
+    from teletype.codes.windows import *
 else:
-    from .posix import *
+    from teletype.codes.posix import *

@@ -2,6 +2,8 @@
 
 from ctypes import windll
 
+__all__ = ["SCAN_CODES", "DEFAULT_CHARS"]
+
 # Allows Windows 10 Anniversary (build>=16257) to use VT100 Codes
 # https://docs.microsoft.com/windows/console/console-virtual-terminal-sequences
 windll.kernel32.SetConsoleMode(windll.kernel32.GetStdHandle(-11), 1 | 2 | 4 | 8)

@@ -1,10 +1,12 @@
+# coding=utf-8
+
 from __future__ import print_function
 
 from sys import stdin
 from termios import TCSADRAIN, tcgetattr, tcsetattr  # pylint: disable=E0401
 from tty import setraw
 
-from .. import codes
+from teletype import codes
 
 
 def get_key(raw=False):
