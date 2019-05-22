@@ -141,7 +141,7 @@ You can also change character sets using `set_char(key, value)` where value is t
 - block
 - left-edge
 - right-edge
-
+    
 
 # License
 
