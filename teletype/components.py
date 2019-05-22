@@ -133,7 +133,7 @@ class Select(Component):
             io.erase_screen()
         if self.header:
             style = None if self.ascii_mode else "bold"
-            io.style_print(self.header+":", style=style)
+            io.style_print(self.header + ":", style=style)
         for i, choice in enumerate(self.choices):
             print(" %s %s" % (g_cursor if i == 0 else " ", choice))
         io.move_cursor(rows=-1 * i - 1)
@@ -208,7 +208,7 @@ class SelectMany(Select):
             io.erase_screen()
         if self.header:
             style = None if self.ascii_mode else "bold"
-            io.style_print(self.header+":", style=style)
+            io.style_print(self.header + ":", style=style)
         for i, choice in enumerate(self.choices):
             print("%s%s %s " % (" " if i else g_arrow, g_unselected, choice))
         io.move_cursor(rows=-1 * i - 1)
