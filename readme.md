@@ -2,13 +2,16 @@
 [![licence](https://img.shields.io/github/license/jkwill87/teletype.svg?style=for-the-badge)](https://en.wikipedia.org/wiki/MIT_License)
 [![code style black](https://img.shields.io/badge/Code%20Style-Black-black.svg?style=for-the-badge)](https://github.com/ambv/black)
 
+
 # teletype
 
 **teletype** is a high-level cross platform tty library compatible with Python 2.7 and 3+. It provides a consistent interface between the terminal and cmd.exe by building on top of [terminfo](https://invisible-island.net/ncurses/terminfo.src.html) and [msvcrt](https://msdn.microsoft.com/en-us/library/abx4dbyh.aspx) and has no dependancies.
 
+
 # Installation
 
 `$ pip install teletype`
+
 
 # I/O Utilities (teletype.io)
 
@@ -34,17 +37,17 @@ else:
 
 ## Styling Output
 
-You can style strings with colours and effects using `style_format`. Styles can be passed in either as a space delimited string or in a collection (e.g. a tuple, set, list, etc.). The passed `text` string is then wrapped in the appropriate ASCII escape sequences and returned. When `print`ed the appropriate styles will be applied.
+You can style strings with COLOURS and effects using `style_format`. Styles can be passed in either as a space delimited string or in a collection (e.g. a tuple, set, list, etc.). The passed `text` string is then wrapped in the appropriate ASCII escape sequences and returned. When `print`ed the appropriate styles will be applied.
 
 Alternatively you can you just pass these same parameters to `style_print` and accomplish this in one fell swoop. `style_print` takes the same parameters as the regular print function and can be used in place. In python3 you can even import style_print as print and use it in place. In order to pull this compatibility off for python2, the `style` argument must be specified explitly when calling, however, e.g. `style_print("yolo", style="yellow")`.
 
 Lastly, you can use `strip_format` to clear a string of any escape sequences that have been previously applied.
 
 ```python
-from teletype.io import style_format, style_print, sstrip_format
+from teletype.io import style_format, style_print, strip_format
 
 # All of these will do the same thing, that is print the message in red and bold
-print(style_format("I want to stand out!", ("bold red")))
+print(style_format("I want to stand out!", "bold red"))
 print(style_format("I want to stand out!", ("red", "bold")))
 style_print("I want to stand out!", style=["red", "bold"])
 
@@ -58,7 +61,8 @@ print(strip_format(text))
 
 ## Cursor manipulation
 
-The package includes quite a few helper functions to move the cursor around the screen. These include `erase_lines`, `erase_screen`, `hide_cursor`, `show_cursor`, and `move_cursor`; all of which are fairly self explanitory. The only word of caution is to remember to reset cursor visibility as its state will persist after the python interpreter has exited.
+The package includes quite a few helper functions to move the CURSOR around the screen. These include `erase_lines`, `erase_screen`, `hide_cursor`, `show_cursor`, and `move_cursor`; all of which are fairly self explanitory. The only word of caution is to remember to reset CURSOR visibility as its state will persist after the python interpreter has exited.
+
 
 # Components (teletype.components)
 
@@ -67,9 +71,9 @@ The package also includes components, higher level UI classes that are composed 
 ## SelectOne
 
 ```python
-from teletype.components import SelectOne
+from teletype.components import Select
 
-picker = SelectOne(
+picker = Select(
     header="Your Favourite Animal?",
     choices=["dog", "bird", "cat", "monkey", "gorilla"],
 )
@@ -117,19 +121,14 @@ ProgressBar().process(iterable(), iterations)
 You can set component primary and secondary styles using `set_style`.
 
 ```python
-from teletype.io import style_print as print
-from teletype.components.config import set_style
-from teletype.components import ProgressBar, SelectMany, SelectOne
+from teletype.components import ProgressBar, SelectMany
 
-set_style(primary="yellow", secondary="magenta")
+config = {"style_primary": "yellow", "style_secondary": "magenta"}
 iterable = range(25)
-choices = [1, 2, 3]
+choices = (1, 2, 3)
 
-print("Progess Bar", style="underline")
-ProgressBar(width=50).process(iterable)
-
-print("Select Many", style="underline")
-SelectMany(choices).prompt()
+ProgressBar(header="Progress Bar", **config).process(iterable)
+SelectMany(choices, header="Select Many", **config).prompt()
 ```
 
 ![Output](https://github.com/jkwill87/teletype/blob/master/_assets/style.png)
@@ -144,6 +143,7 @@ You can also change character sets using `set_char(key, value)` where value is t
 - right-edge
 
 Lastly, you can also use **ascii_mode(enabled=True)** to quickly disable colour stylings and swap to a ascii-only character set.
+
 
 # License
 

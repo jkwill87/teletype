@@ -22,14 +22,14 @@ def erase_lines(n=1):
     """ Erases n lines from the screen and moves the cursor up to follow
     """
     for _ in range(n):
-        print(codes.cursor["up"], end="")
-        print(codes.cursor["eol"], end="")
+        print(codes.CURSOR["up"], end="")
+        print(codes.CURSOR["eol"], end="")
 
 
 def erase_screen():
     """ Clears all text from the screen
     """
-    print(codes.cursor["clear"], end="")
+    print(codes.CURSOR["clear"], end="")
 
 
 def move_cursor(cols=0, rows=0):
@@ -41,8 +41,8 @@ def move_cursor(cols=0, rows=0):
     if cols == 0 and rows == 0:
         return
     commands = ""
-    commands += codes.cursor["up" if rows < 0 else "down"] * abs(rows)
-    commands += codes.cursor["left" if cols < 0 else "right"] * abs(cols)
+    commands += codes.CURSOR["up" if rows < 0 else "down"] * abs(rows)
+    commands += codes.CURSOR["left" if cols < 0 else "right"] * abs(cols)
     if commands:
         print(commands, end="")
         stdout.flush()
@@ -51,13 +51,13 @@ def move_cursor(cols=0, rows=0):
 def show_cursor():
     """ Shows the cursor indicator
     """
-    print(codes.cursor["show"], end="")
+    print(codes.CURSOR["show"], end="")
 
 
 def hide_cursor():
     """ Hides the cursor indicator; remember to call show_cursor before exiting
     """
-    print(codes.cursor["hide"], end="")
+    print(codes.CURSOR["hide"], end="")
 
 
 def strip_format(text):
@@ -79,10 +79,10 @@ def style_format(text, style):
         style = style.split(" ")
     prefix = ""
     for s in style:
-        prefix += codes.colours.get(s, "")
-        prefix += codes.highlights.get(s, "")
-        prefix += codes.modes.get(s, "")
-    return prefix + text + codes.modes["reset"]
+        prefix += codes.COLOURS.get(s, "")
+        prefix += codes.HIGHLIGHTS.get(s, "")
+        prefix += codes.MODES.get(s, "")
+    return prefix + text + codes.MODES["reset"]
 
 
 def style_print(*values, **kwargs):

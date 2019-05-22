@@ -30,4 +30,4 @@ def get_key(raw=False):
     finally:
         tcsetattr(file_descriptor, TCSADRAIN, state)
     result = "".join(chars)
-    return result if raw else codes.keys_flipped.get(result, result)
+    return result if raw else codes.KEYS_FLIPPED.get(result, result)

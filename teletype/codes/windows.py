@@ -8,7 +8,7 @@ __all__ = ["SCAN_CODES", "DEFAULT_CHARS"]
 # https://docs.microsoft.com/windows/console/console-virtual-terminal-sequences
 windll.kernel32.SetConsoleMode(windll.kernel32.GetStdHandle(-11), 1 | 2 | 4 | 8)
 
-scan_codes = {
+SCAN_CODES = {
     13: "\r",
     27: "\x1b",
     15104: "\x1bOP",
@@ -35,7 +35,7 @@ scan_codes = {
     34528: "\x1bO24~",
 }
 
-chars = {
+DEFAULT_CHARS = {
     "primary": {"selected": u"●", "block": u"█"},
     "secondary": {"arrow": u"►", "left-edge": u"▐", "right-edge": u"▌"},
     "plain": {"unselected": u"○"},

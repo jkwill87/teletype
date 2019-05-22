@@ -1,4 +1,6 @@
-keys = {
+# coding=utf-8
+
+KEYS = {
     "lf": "\r",
     "cr": "\n",
     "space": " ",
@@ -35,9 +37,9 @@ keys = {
     "super": "\x1b[3~",
 }
 
-keys_flipped = {v: k for k, v in keys.items()}
+KEYS_FLIPPED = {v: k for k, v in KEYS.items()}
 
-colours = {
+COLOURS = {
     "blue": "\x1b[34m",
     "cyan": "\x1b[36m",
     "green": "\x1b[32m",
@@ -48,7 +50,7 @@ colours = {
     "yellow": "\x1b[33m",
 }
 
-highlights = {
+HIGHLIGHTS = {
     "on-blue": "\x1b[44m",
     "on-cyan": "\x1b[46m",
     "on-green": "\x1b[42m",
@@ -59,7 +61,7 @@ highlights = {
     "on-yellow": "\x1b[43m",
 }
 
-modes = {
+MODES = {
     "blink": "\x1b[5m",
     "bold": "\x1b[1m",
     "concealed": "\x1b[8m",
@@ -71,7 +73,7 @@ modes = {
     "reset": "\x1b[0m",
 }
 
-cursor = {
+CURSOR = {
     "bol": "\x1b[1K",
     "clear": "\x1b[3J\x1b[H\x1b[2J",
     "down": "\x1b[B",
@@ -83,7 +85,7 @@ cursor = {
     "up": "\x1b[A",
 }
 
-escape_sequences = {
+ESCAPE_SEQUENCES = {
     "\x1b",
     "\x1b[",
     "\x1b[1",
@@ -106,4 +108,10 @@ escape_sequences = {
     "\x1b\x1b[2",
     "\x1b\x1b[3",
     "\x1bO",
+}
+
+ASCII_CHARS = {
+    "primary": {"selected": "*", "block": "#"},
+    "secondary": {"arrow": ">", "left-edge": "|", "right-edge": "|"},
+    "plain": {"unselected": "."},
 }
