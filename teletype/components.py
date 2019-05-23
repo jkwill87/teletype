@@ -21,6 +21,8 @@ __all__ = ["SelectOne", "SelectMany", "ProgressBar"]
 
 
 class _Component:
+    """ Base class for all components
+    """
     _ascii_mode: bool
     _backups: Tuple
     display_chars: Dict[str, Dict[str, str]]
@@ -93,6 +95,8 @@ class _Component:
 
 
 class _Select(_Component):
+    """ Base class for selection components
+    """
     _selected_lines: Set[int]
     _col_offset: int
     _line: int
@@ -192,7 +196,9 @@ class _Select(_Component):
                     break
 
     @property
-    def highlighted(self) -> str:
+    def highlighted(self) -> Any:
+        """ Returns the value for the currently highlighted choice
+        """
         choice = self.choices[self._line % len(self.choices)]
         if isinstance(choice, str):
             choice = io.strip_format(choice)
@@ -200,6 +206,8 @@ class _Select(_Component):
 
     @property
     def selected(self) -> Tuple[Any, ...]:
+        """ Returns the values for all currently selected choices
+        """
         return tuple(
             self.choices[line % len(self.choices)]
             for line in self._selected_lines
@@ -207,6 +215,11 @@ class _Select(_Component):
 
 
 class SelectOne(_Select):
+    """ Allows the user to make a single selection
+
+    - Use arrow keys or 'j' and 'k' to highlight selection
+    - Use return key to submit
+    """
     def __init__(self, choices: Any, **config: Any):
         super().__init__(choices, **config)
         self._col_offset = 2
@@ -214,6 +227,8 @@ class SelectOne(_Select):
     def prompt(
         self, can_skip: bool = False, can_quit: bool = False
     ) -> Optional[str]:
+        """ Displays choices to user and prompts them for their selection
+        """
         self._line = 0
         g_cursor = self._get_glyph("arrow")
         if not self.choices:
@@ -243,9 +258,17 @@ class SelectOne(_Select):
 
 
 class SelectMany(_Select):
+    """ Allows users to select multiple items using
+
+    - Use arrow keys or 'j' and 'k' to highlight selection
+    - Use space key to toggle selection
+    - Use return key to submit
+    """
     _selected_lines: Set[int]
 
     def prompt(self) -> Tuple[Any, ...]:
+        """ Displays choices to user and prompts them for their selection(s)
+        """
         self._line = 0
         self._selected_lines = set()
         g_arrow = self._get_glyph("arrow")
@@ -271,6 +294,8 @@ class SelectMany(_Select):
 
 
 class ProgressBar(_Component):
+    """ Displays a progress bar
+    """
     width: int
 
     def __init__(self, **config):
@@ -281,6 +306,8 @@ class ProgressBar(_Component):
             self.width = 80
 
     def process(self, iterable: Iterable, steps: int) -> None:
+        """ Iterates over an object, updating the progress bar on each iteration
+        """
         io.hide_cursor()
         self.update(0, steps)
         skip_count = max(steps // 1000, 1)
@@ -291,6 +318,8 @@ class ProgressBar(_Component):
         print()
 
     def update(self, step: int, steps: int) -> None:
+        """ Manually updates the progress bar
+        """
         g_block = self._get_glyph("block")
         g_l_edge = self._get_glyph("left-edge")
         g_r_edge = self._get_glyph("right-edge")
