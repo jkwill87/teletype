@@ -38,7 +38,7 @@ class _Component:
             "display_chars", deepcopy(codes.DEFAULT_CHARS)
         )
         self.erase_screen = config.get("erase_screen", False)
-        self.header = config.get("header", "").strip().rstrip(":")
+        self.header = config.get("header", "").strip()
         self.style_primary = config.get("style_primary", "green")
         self.style_secondary = config.get("style_secondary", "dark green")
 
@@ -238,7 +238,7 @@ class SelectOne(_Select):
             io.erase_screen()
         if self.header:
             style = None if self.ascii_mode else "bold"
-            io.style_print(self.header + ":", style=style)
+            io.style_print(self.header, style=style)
         for i, choice in enumerate(self.choices):
             print(" %s %s" % (g_cursor if i == 0 else " ", choice))
         io.move_cursor(rows=-1 * i - 1)
@@ -285,7 +285,7 @@ class SelectMany(_Select):
             io.erase_screen()
         if self.header:
             style = None if self.ascii_mode else "bold"
-            io.style_print(self.header + ":", style=style)
+            io.style_print(self.header, style=style)
         for i, choice in enumerate(self.choices):
             print("%s%s %s " % (" " if i else g_arrow, g_unselected, choice))
         io.move_cursor(rows=-1 * i - 1)
