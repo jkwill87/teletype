@@ -17,7 +17,7 @@ from typing import (
 from teletype import codes, io
 from teletype.exceptions import TeletypeQuitException, TeletypeSkipException
 
-__all__ = ["SelectOne", "SelectMany", "ProgressBar"]
+__all__ = ["SelectOne", "SelectApproval", "SelectMany", "ProgressBar"]
 
 
 class _Component:
@@ -255,6 +255,11 @@ class SelectOne(_Select):
         elif can_skip and self.selected in ("skip", "[s]kip"):
             raise TeletypeSkipException
         return self.highlighted
+
+
+class SelectApproval(SelectOne):
+    def __init__(self, **config: Any):
+        super().__init__(("yes", "no"), **config)
 
 
 class SelectMany(_Select):
