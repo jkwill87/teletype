@@ -1,6 +1,82 @@
-# coding=utf-8
+from typing import Dict, Set
 
-KEYS = {
+__all__ = [
+    "ASCII_CHARS",
+    "COLOURS",
+    "CURSOR",
+    "ESCAPE_SEQUENCES",
+    "HIGHLIGHTS",
+    "KEYS",
+    "KEYS_FLIPPED",
+    "MODES",
+]
+
+ASCII_CHARS: Dict[str, Dict[str, str]] = {
+    "primary": {"selected": "*", "block": "#"},
+    "secondary": {"arrow": ">", "left-edge": "|", "right-edge": "|"},
+    "plain": {"unselected": "."},
+}
+
+COLOURS: Dict[str, str] = {
+    "blue": "\x1b[34m",
+    "cyan": "\x1b[36m",
+    "green": "\x1b[32m",
+    "grey": "\x1b[30m",
+    "magenta": "\x1b[35m",
+    "red": "\x1b[31m",
+    "white": "\x1b[37m",
+    "yellow": "\x1b[33m",
+}
+
+CURSOR: Dict[str, str] = {
+    "bol": "\x1b[1K",
+    "clear": "\x1b[3J\x1b[H\x1b[2J",
+    "down": "\x1b[B",
+    "eol": "\x1b[K",
+    "hide": "\x1b[?25l",
+    "left": "\x08",
+    "right": "\x1b[C",
+    "show": "\x1b[?12l\x1b[?25h",
+    "up": "\x1b[A",
+}
+
+ESCAPE_SEQUENCES: Set[str] = {
+    "\x1b",
+    "\x1b[",
+    "\x1b[1",
+    "\x1b[15",
+    "\x1b[16",
+    "\x1b[17",
+    "\x1b[18",
+    "\x1b[19",
+    "\x1b[2",
+    "\x1b[20",
+    "\x1b[21",
+    "\x1b[22",
+    "\x1b[23",
+    "\x1b[24",
+    "\x1b[3",
+    "\x1b[5",
+    "\x1b[6",
+    "\x1b\x1b",
+    "\x1b\x1b[",
+    "\x1b\x1b[2",
+    "\x1b\x1b[3",
+    "\x1bO",
+}
+
+HIGHLIGHTS: Dict[str, str] = {
+    "on-blue": "\x1b[44m",
+    "on-cyan": "\x1b[46m",
+    "on-green": "\x1b[42m",
+    "on-grey": "\x1b[40m",
+    "on-magenta": "\x1b[45m",
+    "on-red": "\x1b[41m",
+    "on-white": "\x1b[47m",
+    "on-yellow": "\x1b[43m",
+}
+
+KEYS: Dict[str, str] = {
     "lf": "\r",
     "cr": "\n",
     "space": " ",
@@ -37,31 +113,9 @@ KEYS = {
     "super": "\x1b[3~",
 }
 
-KEYS_FLIPPED = {v: k for k, v in KEYS.items()}
+KEYS_FLIPPED: Dict[str, str] = {v: k for k, v in KEYS.items()}
 
-COLOURS = {
-    "blue": "\x1b[34m",
-    "cyan": "\x1b[36m",
-    "green": "\x1b[32m",
-    "grey": "\x1b[30m",
-    "magenta": "\x1b[35m",
-    "red": "\x1b[31m",
-    "white": "\x1b[37m",
-    "yellow": "\x1b[33m",
-}
-
-HIGHLIGHTS = {
-    "on-blue": "\x1b[44m",
-    "on-cyan": "\x1b[46m",
-    "on-green": "\x1b[42m",
-    "on-grey": "\x1b[40m",
-    "on-magenta": "\x1b[45m",
-    "on-red": "\x1b[41m",
-    "on-white": "\x1b[47m",
-    "on-yellow": "\x1b[43m",
-}
-
-MODES = {
+MODES: Dict[str, str] = {
     "blink": "\x1b[5m",
     "bold": "\x1b[1m",
     "concealed": "\x1b[8m",
@@ -71,47 +125,4 @@ MODES = {
     "strikeout": "\x1b[9m",
     "underline": "\x1b[4m",
     "reset": "\x1b[0m",
-}
-
-CURSOR = {
-    "bol": "\x1b[1K",
-    "clear": "\x1b[3J\x1b[H\x1b[2J",
-    "down": "\x1b[B",
-    "eol": "\x1b[K",
-    "hide": "\x1b[?25l",
-    "left": "\x08",
-    "right": "\x1b[C",
-    "show": "\x1b[?12l\x1b[?25h",
-    "up": "\x1b[A",
-}
-
-ESCAPE_SEQUENCES = {
-    "\x1b",
-    "\x1b[",
-    "\x1b[1",
-    "\x1b[15",
-    "\x1b[16",
-    "\x1b[17",
-    "\x1b[18",
-    "\x1b[19",
-    "\x1b[2",
-    "\x1b[20",
-    "\x1b[21",
-    "\x1b[22",
-    "\x1b[23",
-    "\x1b[24",
-    "\x1b[3",
-    "\x1b[5",
-    "\x1b[6",
-    "\x1b\x1b",
-    "\x1b\x1b[",
-    "\x1b\x1b[2",
-    "\x1b\x1b[3",
-    "\x1bO",
-}
-
-ASCII_CHARS = {
-    "primary": {"selected": "*", "block": "#"},
-    "secondary": {"arrow": ">", "left-edge": "|", "right-edge": "|"},
-    "plain": {"unselected": "."},
 }

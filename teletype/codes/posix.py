@@ -1,7 +1,9 @@
-# coding=utf-8
+from typing import Dict
 
-DEFAULT_CHARS = {
-    "primary": {"arrow": u"❱", "block": u"█"},
-    "secondary": {"selected": u"●", "left-edge": u"▐", "right-edge": u"▌"},
-    "plain": {"unselected": u"○"},
+__all__ = ["DEFAULT_CHARS"]
+
+DEFAULT_CHARS: Dict[str, Dict[str, str]] = {
+    "primary": {"arrow": "❱", "block": "█"},
+    "secondary": {"selected": "●", "left-edge": "▐", "right-edge": "▌"},
+    "plain": {"unselected": "○"},
 }

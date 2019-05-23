@@ -1,5 +1,3 @@
-# coding=utf-8
-
 from __future__ import print_function
 
 from sys import stdin
@@ -8,8 +6,10 @@ from tty import setraw
 
 from teletype import codes
 
+__all__ = ["get_key"]
 
-def get_key(raw=False):
+
+def get_key(raw: bool = False) -> str:
     """ Gets a single key from stdin
     """
     file_descriptor = stdin.fileno()

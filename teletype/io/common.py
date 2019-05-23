@@ -1,24 +1,24 @@
-# coding=utf-8
-
 from __future__ import print_function
 
 from re import sub
 from sys import stdout
+from typing import Any, Collection, IO, Optional, Union, Tuple
+
 from teletype import codes
 
 __all__ = [
     "erase_lines",
     "erase_screen",
+    "hide_cursor",
     "move_cursor",
     "show_cursor",
-    "hide_cursor",
     "strip_format",
     "style_format",
     "style_print",
 ]
 
 
-def erase_lines(n=1):
+def erase_lines(n: int = 1) -> None:
     """ Erases n lines from the screen and moves the cursor up to follow
     """
     for _ in range(n):
@@ -26,13 +26,13 @@ def erase_lines(n=1):
         print(codes.CURSOR["eol"], end="")
 
 
-def erase_screen():
+def erase_screen() -> None:
     """ Clears all text from the screen
     """
     print(codes.CURSOR["clear"], end="")
 
 
-def move_cursor(cols=0, rows=0):
+def move_cursor(cols: int = 0, rows: int = 0) -> None:
     """ Moves the cursor the given number of columns and rows
     
     The cursor is moved right when cols is positive and left when negative.
@@ -48,25 +48,25 @@ def move_cursor(cols=0, rows=0):
         stdout.flush()
 
 
-def show_cursor():
+def show_cursor() -> None:
     """ Shows the cursor indicator
     """
     print(codes.CURSOR["show"], end="")
 
 
-def hide_cursor():
+def hide_cursor() -> None:
     """ Hides the cursor indicator; remember to call show_cursor before exiting
     """
     print(codes.CURSOR["hide"], end="")
 
 
-def strip_format(text):
+def strip_format(text: str) -> str:
     """ Returns text with all control sequences removed
     """
     return sub(r"(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]", "", text)
 
 
-def style_format(text, style):
+def style_format(text: Any, style: Union[Collection[str], str, None]) -> str:
     """ Wraps texts in terminal control sequences
 
     Style can be passed as either a collection or space delimited string.
@@ -85,9 +85,9 @@ def style_format(text, style):
     return prefix + text + codes.MODES["reset"]
 
 
-def style_print(*values, **kwargs):
+def style_print(*values: Any, **options: Any) -> None:
     """ A convenience function that applies style_format to text before printing
     """
-    style = kwargs.pop("style", None)
-    values = [style_format(value, style) for value in values]
-    print(*values, **kwargs)
+    style = options.pop("style", None)
+    values = tuple(style_format(value, style) for value in values)
+    print(*values, **options)

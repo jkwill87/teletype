@@ -1,14 +1,19 @@
-# coding=utf-8
-
 from ctypes import windll
+from typing import Dict
 
-__all__ = ["SCAN_CODES", "DEFAULT_CHARS"]
+__all__ = ["DEFAULT_CHARS", "SCAN_CODES"]
 
 # Allows Windows 10 Anniversary (build>=16257) to use VT100 Codes
 # https://docs.microsoft.com/windows/console/console-virtual-terminal-sequences
 windll.kernel32.SetConsoleMode(windll.kernel32.GetStdHandle(-11), 1 | 2 | 4 | 8)
 
-SCAN_CODES = {
+DEFAULT_CHARS: Dict[str, Dict[str, str]] = {
+    "primary": {"selected": "●", "block": "█"},
+    "secondary": {"arrow": "►", "left-edge": "▐", "right-edge": "▌"},
+    "plain": {"unselected": "○"},
+}
+
+SCAN_CODES: Dict[int, str] = {
     13: "\r",
     27: "\x1b",
     15104: "\x1bOP",
@@ -33,10 +38,4 @@ SCAN_CODES = {
     21472: "\x1b[3~",
     22272: "\x1bO23~",
     34528: "\x1bO24~",
-}
-
-DEFAULT_CHARS = {
-    "primary": {"selected": u"●", "block": u"█"},
-    "secondary": {"arrow": u"►", "left-edge": u"▐", "right-edge": u"▌"},
-    "plain": {"unselected": u"○"},
 }

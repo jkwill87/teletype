@@ -1,11 +1,12 @@
-# coding=utf-8
-
+# noinspection PyUnresolvedReferences
 from msvcrt import getch, kbhit  # pylint: disable=E0401
 
 from teletype.codes import KEYS_FLIPPED, SCAN_CODES
 
+__all__ = ["get_key"]
 
-def get_key(raw=False):
+
+def get_key(raw: bool = False) -> str:
     """ Gets a single key from stdin
     """
     while True:
@@ -14,9 +15,9 @@ def get_key(raw=False):
                 char = getch()
                 ordinal = ord(char)
                 if ordinal in (0, 224):
-                    extention = ord(getch())
-                    scan_code = ordinal + extention * 256
-                    result = SCAN_CODES.get(scan_code)
+                    extension = ord(getch())
+                    scan_code = ordinal + extension * 256
+                    result = SCAN_CODES[scan_code]
                     break
                 else:
                     result = char.decode()
