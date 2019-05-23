@@ -23,6 +23,8 @@ __all__ = ["SelectOne", "SelectApproval", "SelectMany", "ProgressBar"]
 class _Component:
     """ Base class for all components
     """
+
+    # Member type definitions
     _ascii_mode: bool
     _backups: Tuple
     display_chars: Dict[str, Dict[str, str]]
@@ -97,6 +99,8 @@ class _Component:
 class _Select(_Component):
     """ Base class for selection components
     """
+
+    # Member type definitions
     _selected_lines: Set[int]
     _col_offset: int
     _line: int
@@ -220,6 +224,7 @@ class SelectOne(_Select):
     - Use arrow keys or 'j' and 'k' to highlight selection
     - Use return key to submit
     """
+
     def __init__(self, choices: Any, **config: Any):
         super().__init__(choices, **config)
         self._col_offset = 2
@@ -258,6 +263,9 @@ class SelectOne(_Select):
 
 
 class SelectApproval(SelectOne):
+    """ Simple extension of SelectOne offering the option of selecting yes or no
+    """
+
     def __init__(self, **config: Any):
         super().__init__(("yes", "no"), **config)
 
@@ -269,6 +277,8 @@ class SelectMany(_Select):
     - Use space key to toggle selection
     - Use return key to submit
     """
+
+    # Member type definitions
     _selected_lines: Set[int]
 
     def prompt(self) -> Tuple[Any, ...]:
@@ -301,6 +311,8 @@ class SelectMany(_Select):
 class ProgressBar(_Component):
     """ Displays a progress bar
     """
+
+    # Member type definitions
     width: int
 
     def __init__(self, **config):
