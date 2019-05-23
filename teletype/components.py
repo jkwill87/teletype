@@ -17,10 +17,10 @@ from typing import (
 from teletype import codes, io
 from teletype.exceptions import TeletypeQuitException, TeletypeSkipException
 
-__all__ = ["Select", "SelectMany", "ProgressBar"]
+__all__ = ["SelectOne", "SelectMany", "ProgressBar"]
 
 
-class Component:
+class _Component:
     _ascii_mode: bool
     _backups: Tuple
     display_chars: Dict[str, Dict[str, str]]
@@ -92,11 +92,10 @@ class Component:
         self.display_chars[category][key] = value
 
 
-class Select(Component):
+class _Select(_Component):
+    _selected_lines: Set[int]
     _col_offset: int
     _line: int
-    can_quit: bool
-    can_skip: bool
     choices: List[Any]
 
     def __init__(self, choices: Any, **config: Any):
@@ -108,25 +107,34 @@ class Select(Component):
                 unique_choices.add(choice)
                 self.choices.append(choice)
         self._line = 0
-        self._col_offset = 2
-        # Set skip text
-        self.can_skip = True if config.get("skip") else False
-        if self.can_skip:
-            if self.ascii_mode:
-                s = "[s]kip"
-            else:
-                s = io.style_format("s", "dark underline")
-                s += io.style_format("kip", "dark")
-            self.choices.append(s)
-        # Set quit text
-        self.can_quit = True if config.get("quit") else False
-        if self.can_quit:
-            if self.ascii_mode:
-                s = "[q]uit"
-            else:
-                s = io.style_format("q", "dark underline")
-                s += io.style_format("uit", "dark")
-            self.choices.append(s)
+        self._selected_lines = set()
+        self._col_offset = 1
+
+    def _add_skip_choice(self) -> List[Any]:
+        if self.ascii_mode:
+            s = "[s]kip"
+        else:
+            s = io.style_format("s", "dark underline")
+            s += io.style_format("kip", "dark")
+        return self.choices + [s]
+
+    def _add_quit_choice(self):
+        if self.ascii_mode:
+            s = "[q]uit"
+        else:
+            s = io.style_format("q", "dark underline")
+            s += io.style_format("uit", "dark")
+        return self.choices + [s]
+
+    def _select_line(self) -> None:
+        self._selected_lines ^= {self._line}
+        io.move_cursor(cols=1)
+        if self._line in self._selected_lines:
+            glyph = self._get_glyph("selected")
+        else:
+            glyph = self._get_glyph("unselected")
+        print(glyph, end="")
+        io.move_cursor(cols=-2)
 
     def _move_line(self, distance: int) -> int:
         # col_offset logic is used to properly clear whitespace before choices
@@ -141,7 +149,71 @@ class Select(Component):
         io.move_cursor(cols=-self._col_offset)
         return offset
 
-    def prompt(self) -> Optional[str]:
+    def _capture_keypress(
+        self,
+        accept_s=False,
+        accept_q=False,
+        accept_space=False,
+        accept_escape=False,
+    ):
+        while True:
+            key = io.get_key()
+            # navigation key pressed
+            if key in {"up", "k"}:
+                self._move_line(-1)
+            elif key in {"down", "j"}:
+                self._move_line(1)
+            # escape sequences pressed
+            elif (
+                accept_escape
+                and key
+                in {"ctrl-c", "ctrl-d", "ctrl-z"} | codes.ESCAPE_SEQUENCES
+            ):
+                io.move_cursor(0, len(self.choices) - self._line)
+                io.show_cursor()
+                raise TeletypeQuitException
+            # enter pressed
+            elif key in ("lf", "nl"):
+                break
+            # space pressed
+            elif accept_space and key == "space":
+                self._select_line()
+            # skip selected
+            elif accept_s and key == "s":
+                distance = len(self.choices) - self._line - 1
+                if accept_q:
+                    distance -= 1
+                if not self._move_line(distance):
+                    break
+            # quit selected
+            elif accept_q and key == "q":
+                distance = len(self.choices) - self._line - 1
+                if not self._move_line(distance):
+                    break
+
+    @property
+    def highlighted(self) -> str:
+        choice = self.choices[self._line % len(self.choices)]
+        if isinstance(choice, str):
+            choice = io.strip_format(choice)
+        return choice
+
+    @property
+    def selected(self) -> Tuple[Any, ...]:
+        return tuple(
+            self.choices[line % len(self.choices)]
+            for line in self._selected_lines
+        )
+
+
+class SelectOne(_Select):
+    def __init__(self, choices: Any, **config: Any):
+        super().__init__(choices, **config)
+        self._col_offset = 2
+
+    def prompt(
+        self, can_skip: bool = False, can_quit: bool = False
+    ) -> Optional[str]:
         self._line = 0
         g_cursor = self._get_glyph("arrow")
         if not self.choices:
@@ -155,66 +227,23 @@ class Select(Component):
         for i, choice in enumerate(self.choices):
             print(" %s %s" % (g_cursor if i == 0 else " ", choice))
         io.move_cursor(rows=-1 * i - 1)
-        while True:
-            key = io.get_key()
-            if key in {"up", "k"}:
-                self._move_line(-1)
-            elif key in {"down", "j"}:
-                self._move_line(1)
-            elif key in {"ctrl-c", "ctrl-d", "ctrl-z"} | codes.ESCAPE_SEQUENCES:
-                io.move_cursor(0, len(self.choices) - self._line)
-                io.show_cursor()
-                raise TeletypeQuitException
-            elif key == "s" and self.can_skip:
-                distance = len(self.choices) - self._line - 1
-                if self.can_quit:
-                    distance -= 1
-                if not self._move_line(distance):
-                    break
-            elif key == "q" and self.can_quit:
-                distance = len(self.choices) - self._line - 1
-                if not self._move_line(distance):
-                    break
-            elif key in ("lf", "nl"):
-                break
+        self._capture_keypress(
+            accept_escape=True, accept_s=can_skip, accept_q=can_quit
+        )
         if self.erase_screen:
             io.erase_screen()
         else:
             io.move_cursor(rows=len(self.choices) - self._line)
         io.show_cursor()
-        if self.can_quit and self.selected in ("quit", "[q]uit"):
+        if can_quit and self.selected in ("quit", "[q]uit"):
             raise TeletypeQuitException
-        elif self.can_skip and self.selected in ("skip", "[s]kip"):
+        elif can_skip and self.selected in ("skip", "[s]kip"):
             raise TeletypeSkipException
-        return self.selected
-
-    @property
-    def selected(self) -> str:
-        choice = self.choices[self._line % len(self.choices)]
-        if isinstance(choice, str):
-            choice = io.strip_format(choice)
-        return choice
+        return self.highlighted
 
 
-class SelectMany(Select):
+class SelectMany(_Select):
     _selected_lines: Set[int]
-
-    def __init__(self, choices: Any, **config: Any) -> None:
-        config["quit"] = False
-        config["skip"] = False
-        super().__init__(choices, **config)
-        self._selected_lines = set()
-        self._col_offset = 1
-
-    def _select_line(self) -> None:
-        self._selected_lines ^= {self._line}
-        io.move_cursor(cols=1)
-        if self._line in self._selected_lines:
-            glyph = self._get_glyph("selected")
-        else:
-            glyph = self._get_glyph("unselected")
-        print(glyph, end="")
-        io.move_cursor(cols=-2)
 
     def prompt(self) -> Tuple[Any, ...]:
         self._line = 0
@@ -232,20 +261,7 @@ class SelectMany(Select):
         for i, choice in enumerate(self.choices):
             print("%s%s %s " % (" " if i else g_arrow, g_unselected, choice))
         io.move_cursor(rows=-1 * i - 1)
-        while True:
-            key = io.get_key()
-            if key in {"up", "k"}:
-                self._move_line(-1)
-            elif key in {"down", "j"}:
-                self._move_line(1)
-            elif key in {"ctrl-c", "ctrl-d", "ctrl-z"} | codes.ESCAPE_SEQUENCES:
-                io.move_cursor(0, len(self.choices) - self._line)
-                io.show_cursor()
-                raise TeletypeQuitException
-            elif key == "space":
-                self._select_line()
-            elif key in ("lf", "nl"):
-                break
+        self._capture_keypress(accept_escape=True, accept_space=True)
         if self.erase_screen:
             io.erase_screen()
         else:
@@ -253,15 +269,8 @@ class SelectMany(Select):
         io.show_cursor()
         return self.selected
 
-    @property
-    def selected(self) -> Tuple[Any, ...]:
-        return tuple(
-            self.choices[line % len(self.choices)]
-            for line in self._selected_lines
-        )
 
-
-class ProgressBar(Component):
+class ProgressBar(_Component):
     width: int
 
     def __init__(self, **config):

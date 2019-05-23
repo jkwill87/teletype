@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from re import sub
 from sys import stdout
-from typing import Any, Collection, IO, Optional, Union, Tuple
+from typing import Any, Collection, Union
 
 from teletype import codes
 

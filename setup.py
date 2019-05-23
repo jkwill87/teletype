@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from os import name
-
 from setuptools import setup, find_packages
 
 from teletype import VERSION
