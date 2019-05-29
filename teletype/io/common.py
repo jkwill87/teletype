@@ -1,8 +1,9 @@
+# coding=utf-8
+
 from __future__ import print_function
 
 from re import sub
 from sys import stdout
-from typing import Any, Collection, Union
 
 from teletype import codes
 
@@ -18,7 +19,7 @@ __all__ = [
 ]
 
 
-def erase_lines(n: int = 1) -> None:
+def erase_lines(n=1):
     """ Erases n lines from the screen and moves the cursor up to follow
     """
     for _ in range(n):
@@ -26,13 +27,13 @@ def erase_lines(n: int = 1) -> None:
         print(codes.CURSOR["eol"], end="")
 
 
-def erase_screen() -> None:
+def erase_screen():
     """ Clears all text from the screen
     """
     print(codes.CURSOR["clear"], end="")
 
 
-def move_cursor(cols: int = 0, rows: int = 0) -> None:
+def move_cursor(cols=0, rows=0):
     """ Moves the cursor the given number of columns and rows
     
     The cursor is moved right when cols is positive and left when negative.
@@ -48,25 +49,25 @@ def move_cursor(cols: int = 0, rows: int = 0) -> None:
         stdout.flush()
 
 
-def show_cursor() -> None:
+def show_cursor():
     """ Shows the cursor indicator
     """
     print(codes.CURSOR["show"], end="")
 
 
-def hide_cursor() -> None:
+def hide_cursor():
     """ Hides the cursor indicator; remember to call show_cursor before exiting
     """
     print(codes.CURSOR["hide"], end="")
 
 
-def strip_format(text: str) -> str:
+def strip_format(text):
     """ Returns text with all control sequences removed
     """
     return sub(r"(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]", "", text)
 
 
-def style_format(text: Any, style: Union[Collection[str], str, None]) -> str:
+def style_format(text, style):
     """ Wraps texts in terminal control sequences
 
     Style can be passed as either a collection or space delimited string.
@@ -85,7 +86,7 @@ def style_format(text: Any, style: Union[Collection[str], str, None]) -> str:
     return prefix + text + codes.MODES["reset"]
 
 
-def style_print(*values: Any, **options: Any) -> None:
+def style_print(*values, **options):
     """ A convenience function that applies style_format to text before printing
     """
     style = options.pop("style", None)

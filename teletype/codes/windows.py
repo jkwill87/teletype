@@ -1,5 +1,6 @@
+# coding=utf-8
+
 from ctypes import windll
-from typing import Dict
 
 __all__ = ["DEFAULT_CHARS", "SCAN_CODES"]
 
@@ -7,13 +8,13 @@ __all__ = ["DEFAULT_CHARS", "SCAN_CODES"]
 # https://docs.microsoft.com/windows/console/console-virtual-terminal-sequences
 windll.kernel32.SetConsoleMode(windll.kernel32.GetStdHandle(-11), 1 | 2 | 4 | 8)
 
-DEFAULT_CHARS: Dict[str, Dict[str, str]] = {
-    "primary": {"selected": "●", "block": "█"},
-    "secondary": {"arrow": "►", "left-edge": "▐", "right-edge": "▌"},
-    "plain": {"unselected": "○"},
+DEFAULT_CHARS = {
+    "primary": {"selected": u"●", "block": u"█"},
+    "secondary": {"arrow": u"►", "left-edge": u"▐", "right-edge": u"▌"},
+    "plain": {"unselected": u"○"},
 }
 
-SCAN_CODES: Dict[int, str] = {
+SCAN_CODES = {
     13: "\r",
     27: "\x1b",
     15104: "\x1bOP",

@@ -1,18 +1,10 @@
+# coding=utf-8
+
 from __future__ import print_function
 
+import os
+from collections import namedtuple
 from copy import deepcopy
-from os import get_terminal_size
-from typing import (
-    Any,
-    Collection,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    Set,
-    Tuple,
-    Union,
-)
 
 from teletype import codes, io
 from teletype.exceptions import TeletypeQuitException, TeletypeSkipException
@@ -24,16 +16,7 @@ class _Component:
     """ Base class for all components
     """
 
-    # Member type definitions
-    _ascii_mode: bool
-    _backups: Tuple
-    display_chars: Dict[str, Dict[str, str]]
-    erase_screen: bool
-    header: str
-    style_primary: Union[Collection[str], str, None]
-    style_secondary: Union[Collection[str], str, None]
-
-    def __init__(self, **config: Any) -> None:
+    def __init__(self, **config):
         self._backups = ()
         self.ascii_mode = config.get("ascii_mode", False)
         self.display_chars = config.get(
@@ -44,13 +27,13 @@ class _Component:
         self.style_primary = config.get("style_primary", "green")
         self.style_secondary = config.get("style_secondary", "dark green")
 
-    def _get_char_category(self, key: str) -> str:
+    def _get_char_category(self, key):
         for category, d in self.display_chars.items():
             if key in d.keys():
                 return category
         raise KeyError
 
-    def _get_glyph(self, key: str) -> str:
+    def _get_glyph(self, key):
         category = self._get_char_category(key)
         if not category:
             raise KeyError
@@ -62,11 +45,11 @@ class _Component:
         return glyph
 
     @property
-    def ascii_mode(self) -> bool:
+    def ascii_mode(self):
         return getattr(self, "_ascii_mode", False)
 
     @ascii_mode.setter
-    def ascii_mode(self, enabled: bool):
+    def ascii_mode(self, enabled):
         """ Disables color and switches to an ASCII character set if True.
         """
         enabled = True if enabled else False
@@ -100,41 +83,39 @@ class _Select(_Component):
     """ Base class for selection components
     """
 
-    # Member type definitions
-    _selected_lines: Set[int]
-    _col_offset: int
-    _line: int
-    choices: List[Any]
-
-    def __init__(self, choices: Any, **config: Any):
-        super().__init__(**config)
-        unique_choices: Set[Any] = set()
-        self.choices = []
+    def __init__(self, choices, **config):
+        _Component.__init__(self, **config)
+        unique_choices = set()
+        self._choices = []
         for choice in choices:
             if choice not in unique_choices:
                 unique_choices.add(choice)
-                self.choices.append(choice)
+                self._choices.append(choice)
         self._line = 0
         self._selected_lines = set()
         self._col_offset = 1
+        self._extra_choices = []
 
-    def _add_skip_choice(self) -> List[Any]:
+    def _extra_choice__add_skip(self):
         if self.ascii_mode:
             s = "[s]kip"
         else:
             s = io.style_format("s", "dark underline")
             s += io.style_format("kip", "dark")
-        return self.choices + [s]
+        self._extra_choices.append(s)
 
-    def _add_quit_choice(self):
+    def _extra_choice__add_quit(self):
         if self.ascii_mode:
             s = "[q]uit"
         else:
             s = io.style_format("q", "dark underline")
             s += io.style_format("uit", "dark")
-        return self.choices + [s]
+        self._extra_choices.append(s)
 
-    def _select_line(self) -> None:
+    def _extra_choice__clear(self):
+        self._extra_choices = []
+
+    def _select_line(self):
         self._selected_lines ^= {self._line}
         io.move_cursor(cols=1)
         if self._line in self._selected_lines:
@@ -144,7 +125,7 @@ class _Select(_Component):
         print(glyph, end="")
         io.move_cursor(cols=-2)
 
-    def _move_line(self, distance: int) -> int:
+    def _move_line(self, distance):
         # col_offset logic is used to properly clear whitespace before choices
         g_cursor = self._get_glyph("arrow")
         offset = (self._line + distance) % len(self.choices) - self._line
@@ -157,13 +138,11 @@ class _Select(_Component):
         io.move_cursor(cols=-self._col_offset)
         return offset
 
-    def _capture_keypress(
-        self,
-        accept_s=False,
-        accept_q=False,
-        accept_space=False,
-        accept_escape=False,
+    def _get_selection(
+        self, accept_skip=False, accept_quit=False, accept_space=False
     ):
+        io.hide_cursor()
+        err = None
         while True:
             key = io.get_key()
             # navigation key pressed
@@ -171,36 +150,45 @@ class _Select(_Component):
                 self._move_line(-1)
             elif key in {"down", "j"}:
                 self._move_line(1)
-            # escape sequences pressed
-            elif (
-                accept_escape
-                and key
-                in {"ctrl-c", "ctrl-d", "ctrl-z"} | codes.ESCAPE_SEQUENCES
-            ):
-                io.move_cursor(0, len(self.choices) - self._line)
-                io.show_cursor()
-                raise TeletypeQuitException
-            # enter pressed
-            elif key in ("lf", "nl"):
-                break
             # space pressed
             elif accept_space and key == "space":
                 self._select_line()
+            # enter pressed
+            elif key in ("lf", "nl"):
+                break
             # skip selected
-            elif accept_s and key == "s":
+            elif accept_skip and key == "s":
                 distance = len(self.choices) - self._line - 1
-                if accept_q:
+                if accept_quit:
                     distance -= 1
                 if not self._move_line(distance):
+                    err = TeletypeSkipException
                     break
             # quit selected
-            elif accept_q and key == "q":
+            elif accept_quit and key == "q":
                 distance = len(self.choices) - self._line - 1
                 if not self._move_line(distance):
+                    err = TeletypeQuitException
                     break
+            # escape sequences pressed
+            elif key in {"ctrl-c", "ctrl-d", "ctrl-z"} | codes.ESCAPE_SEQUENCES:
+                err = TeletypeQuitException
+                break
+        io.show_cursor()
+        if self.erase_screen:
+            io.erase_screen()
+        else:
+            io.move_cursor(rows=len(self.choices) - self._line)
+        self._extra_choice__clear()
+        if err:
+            raise err
 
     @property
-    def highlighted(self) -> Any:
+    def choices(self):
+        return self._choices + self._extra_choices
+
+    @property
+    def highlighted(self):
         """ Returns the value for the currently highlighted choice
         """
         choice = self.choices[self._line % len(self.choices)]
@@ -209,7 +197,7 @@ class _Select(_Component):
         return choice
 
     @property
-    def selected(self) -> Tuple[Any, ...]:
+    def selected(self):
         """ Returns the values for all currently selected choices
         """
         return tuple(
@@ -225,20 +213,21 @@ class SelectOne(_Select):
     - Use return key to submit
     """
 
-    def __init__(self, choices: Any, **config: Any):
-        super().__init__(choices, **config)
+    def __init__(self, choices, **config):
+        _Select.__init__(self, choices, **config)
         self._col_offset = 2
 
-    def prompt(
-        self, can_skip: bool = False, can_quit: bool = False
-    ) -> Optional[str]:
+    def prompt(self, can_skip=False, can_quit=False):
         """ Displays choices to user and prompts them for their selection
         """
         self._line = 0
         g_cursor = self._get_glyph("arrow")
         if not self.choices:
             return None
-        io.hide_cursor()
+        if can_skip:
+            self._extra_choice__add_skip()
+        if can_quit:
+            self._extra_choice__add_quit()
         if self.erase_screen:
             io.erase_screen()
         if self.header:
@@ -247,18 +236,7 @@ class SelectOne(_Select):
         for i, choice in enumerate(self.choices):
             print(" %s %s" % (g_cursor if i == 0 else " ", choice))
         io.move_cursor(rows=-1 * i - 1)
-        self._capture_keypress(
-            accept_escape=True, accept_s=can_skip, accept_q=can_quit
-        )
-        if self.erase_screen:
-            io.erase_screen()
-        else:
-            io.move_cursor(rows=len(self.choices) - self._line)
-        io.show_cursor()
-        if can_quit and self.selected in ("quit", "[q]uit"):
-            raise TeletypeQuitException
-        elif can_skip and self.selected in ("skip", "[s]kip"):
-            raise TeletypeSkipException
+        self._get_selection(accept_skip=can_skip, accept_quit=can_quit)
         return self.highlighted
 
 
@@ -266,8 +244,8 @@ class SelectApproval(SelectOne):
     """ Simple extension of SelectOne offering the option of selecting yes or no
     """
 
-    def __init__(self, **config: Any):
-        super().__init__(("yes", "no"), **config)
+    def __init__(self, **config):
+        SelectOne.__init__(self, ("yes", "no"), **config)
 
 
 class SelectMany(_Select):
@@ -278,10 +256,7 @@ class SelectMany(_Select):
     - Use return key to submit
     """
 
-    # Member type definitions
-    _selected_lines: Set[int]
-
-    def prompt(self) -> Tuple[Any, ...]:
+    def prompt(self):
         """ Displays choices to user and prompts them for their selection(s)
         """
         self._line = 0
@@ -290,7 +265,6 @@ class SelectMany(_Select):
         g_unselected = self._get_glyph("unselected")
         if not self.choices:
             return tuple()
-        io.hide_cursor()
         if self.erase_screen:
             io.erase_screen()
         if self.header:
@@ -299,12 +273,7 @@ class SelectMany(_Select):
         for i, choice in enumerate(self.choices):
             print("%s%s %s " % (" " if i else g_arrow, g_unselected, choice))
         io.move_cursor(rows=-1 * i - 1)
-        self._capture_keypress(accept_escape=True, accept_space=True)
-        if self.erase_screen:
-            io.erase_screen()
-        else:
-            io.move_cursor(rows=len(self.choices) - self._line)
-        io.show_cursor()
+        self._get_selection(accept_space=True)
         return self.selected
 
 
@@ -312,17 +281,15 @@ class ProgressBar(_Component):
     """ Displays a progress bar
     """
 
-    # Member type definitions
-    width: int
-
     def __init__(self, **config):
-        super().__init__(**config)
+        _Component.__init__(self, **config)
         try:
-            self.width = config.get("width", get_terminal_size().columns)
-        except OSError:
+            # Python 3.3+ only
+            self.width = config.get("width", os.get_terminal_size().columns)
+        except (AttributeError, OSError):
             self.width = 80
 
-    def process(self, iterable: Iterable, steps: int) -> None:
+    def process(self, iterable, steps):
         """ Iterates over an object, updating the progress bar on each iteration
         """
         io.hide_cursor()
@@ -334,7 +301,7 @@ class ProgressBar(_Component):
         io.show_cursor()
         print()
 
-    def update(self, step: int, steps: int) -> None:
+    def update(self, step, steps):
         """ Manually updates the progress bar
         """
         g_block = self._get_glyph("block")
@@ -350,3 +317,11 @@ class ProgressBar(_Component):
         units = units_total * step // steps
         line = prefix + units * g_block + (units_total - units) * " " + suffix
         print("\r%s" % line, end="")
+
+
+class Choice(namedtuple("Choice", ("value", "is_dimmed", "use_mnemonic"))):
+    __slots__ = ()
+
+    @property
+    def mnemonic(self):
+        return str(self.value).upper() if self.use_mnemonic else None

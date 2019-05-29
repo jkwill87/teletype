@@ -1,23 +1,12 @@
-from typing import Dict, Set
+# coding=utf-8
 
-__all__ = [
-    "ASCII_CHARS",
-    "COLOURS",
-    "CURSOR",
-    "ESCAPE_SEQUENCES",
-    "HIGHLIGHTS",
-    "KEYS",
-    "KEYS_FLIPPED",
-    "MODES",
-]
-
-ASCII_CHARS: Dict[str, Dict[str, str]] = {
+ASCII_CHARS = {
     "primary": {"selected": "*", "block": "#"},
     "secondary": {"arrow": ">", "left-edge": "|", "right-edge": "|"},
     "plain": {"unselected": "."},
 }
 
-COLOURS: Dict[str, str] = {
+COLOURS = {
     "blue": "\x1b[34m",
     "cyan": "\x1b[36m",
     "green": "\x1b[32m",
@@ -28,7 +17,7 @@ COLOURS: Dict[str, str] = {
     "yellow": "\x1b[33m",
 }
 
-CURSOR: Dict[str, str] = {
+CURSOR = {
     "bol": "\x1b[1K",
     "clear": "\x1b[3J\x1b[H\x1b[2J",
     "down": "\x1b[B",
@@ -40,7 +29,7 @@ CURSOR: Dict[str, str] = {
     "up": "\x1b[A",
 }
 
-ESCAPE_SEQUENCES: Set[str] = {
+ESCAPE_SEQUENCES = {
     "\x1b",
     "\x1b[",
     "\x1b[1",
@@ -65,7 +54,7 @@ ESCAPE_SEQUENCES: Set[str] = {
     "\x1bO",
 }
 
-HIGHLIGHTS: Dict[str, str] = {
+HIGHLIGHTS = {
     "on-blue": "\x1b[44m",
     "on-cyan": "\x1b[46m",
     "on-green": "\x1b[42m",
@@ -76,7 +65,7 @@ HIGHLIGHTS: Dict[str, str] = {
     "on-yellow": "\x1b[43m",
 }
 
-KEYS: Dict[str, str] = {
+KEYS = {
     "lf": "\r",
     "cr": "\n",
     "space": " ",
@@ -113,9 +102,9 @@ KEYS: Dict[str, str] = {
     "super": "\x1b[3~",
 }
 
-KEYS_FLIPPED: Dict[str, str] = {v: k for k, v in KEYS.items()}
+KEYS_FLIPPED = {v: k for k, v in KEYS.items()}
 
-MODES: Dict[str, str] = {
+MODES = {
     "blink": "\x1b[5m",
     "bold": "\x1b[1m",
     "concealed": "\x1b[8m",

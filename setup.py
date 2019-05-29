@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 from teletype import VERSION
 
@@ -17,7 +17,6 @@ setup(
     long_description_content_type="text/markdown",
     name="teletype",
     packages=find_packages(),
-    python_requires=">=3.6",
     url="https://github.com/jkwill87/teletype",
     version=VERSION,
 )

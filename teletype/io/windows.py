@@ -1,12 +1,14 @@
+# coding=utf-8
+
 # noinspection PyUnresolvedReferences
-from msvcrt import getch, kbhit  # pylint: disable=E0401
+from msvcrt import getch, kbhit  # pylint=E0401
 
 from teletype.codes import KEYS_FLIPPED, SCAN_CODES
 
 __all__ = ["get_key"]
 
 
-def get_key(raw: bool = False) -> str:
+def get_key(raw=False):
     """ Gets a single key from stdin
     """
     while True:
