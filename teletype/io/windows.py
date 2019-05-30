@@ -1,7 +1,7 @@
 # coding=utf-8
 
 # noinspection PyUnresolvedReferences
-from msvcrt import getch, kbhit  # pylint=E0401
+from msvcrt import getch, kbhit  # pylint: disable=import-error
 
 from teletype.codes import KEYS_FLIPPED, SCAN_CODES
 

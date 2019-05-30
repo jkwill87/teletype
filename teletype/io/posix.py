@@ -3,7 +3,7 @@
 from __future__ import print_function
 
 from sys import stdin
-from termios import TCSADRAIN, tcgetattr, tcsetattr  # pylint: disable=E0401
+from termios import TCSADRAIN, tcgetattr, tcsetattr
 from tty import setraw
 
 from teletype import codes
