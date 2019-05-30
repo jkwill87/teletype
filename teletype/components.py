@@ -3,22 +3,19 @@
 from __future__ import print_function
 
 import os
-from collections import namedtuple
 from copy import deepcopy
 
 from teletype import codes, io
-from teletype.exceptions import TeletypeQuitException, TeletypeSkipException
 
-__all__ = ["SelectOne", "SelectApproval", "SelectMany", "ProgressBar"]
+__all__ = ["SelectOne", "SelectApproval", "SelectMany", "ProgressBar", "Choice"]
 
 
-class _Component:
+class _Component(object):
     """ Base class for all components
     """
 
     def __init__(self, **config):
         self._backups = ()
-        self.ascii_mode = config.get("ascii_mode", False)
         self.display_chars = config.get(
             "display_chars", deepcopy(codes.DEFAULT_CHARS)
         )
@@ -44,32 +41,6 @@ class _Component:
             glyph = io.style_format(glyph, self.style_secondary)
         return glyph
 
-    @property
-    def ascii_mode(self):
-        return getattr(self, "_ascii_mode", False)
-
-    @ascii_mode.setter
-    def ascii_mode(self, enabled):
-        """ Disables color and switches to an ASCII character set if True.
-        """
-        enabled = True if enabled else False
-        if not (enabled or self._backups) or (enabled and self.ascii_mode):
-            return
-        if enabled:
-            self._backups = (
-                self.display_chars.copy(),
-                self.style_primary,
-                self.style_secondary,
-            )
-            self.display_chars = deepcopy(codes.ASCII_CHARS)
-            self.style_primary = None
-            self.style_secondary = None
-        else:
-            self.display_chars, self.style_primary, self.style_secondary = (
-                self._backups
-            )
-        self._ascii_mode = enabled
-
     def char_set(self, key, value):
         """ Updates charters used to render components.
         """
@@ -86,34 +57,14 @@ class _Select(_Component):
     def __init__(self, choices, **config):
         _Component.__init__(self, **config)
         unique_choices = set()
-        self._choices = []
+        self.choices = []
         for choice in choices:
             if choice not in unique_choices:
                 unique_choices.add(choice)
-                self._choices.append(choice)
+                self.choices.append(choice)
         self._line = 0
         self._selected_lines = set()
         self._col_offset = 1
-        self._extra_choices = []
-
-    def _extra_choice__add_skip(self):
-        if self.ascii_mode:
-            s = "[s]kip"
-        else:
-            s = io.style_format("s", "dark underline")
-            s += io.style_format("kip", "dark")
-        self._extra_choices.append(s)
-
-    def _extra_choice__add_quit(self):
-        if self.ascii_mode:
-            s = "[q]uit"
-        else:
-            s = io.style_format("q", "dark underline")
-            s += io.style_format("uit", "dark")
-        self._extra_choices.append(s)
-
-    def _extra_choice__clear(self):
-        self._extra_choices = []
 
     def _select_line(self):
         self._selected_lines ^= {self._line}
@@ -138,9 +89,7 @@ class _Select(_Component):
         io.move_cursor(cols=-self._col_offset)
         return offset
 
-    def _get_selection(
-        self, accept_skip=False, accept_quit=False, accept_space=False
-    ):
+    def _get_selection(self, multiselect=False):
         io.hide_cursor()
         err = None
         while True:
@@ -151,41 +100,22 @@ class _Select(_Component):
             elif key in {"down", "j"}:
                 self._move_line(1)
             # space pressed
-            elif accept_space and key == "space":
+            elif multiselect and key == "space":
                 self._select_line()
             # enter pressed
             elif key in ("lf", "nl"):
                 break
-            # skip selected
-            elif accept_skip and key == "s":
-                distance = len(self.choices) - self._line - 1
-                if accept_quit:
-                    distance -= 1
-                if not self._move_line(distance):
-                    err = TeletypeSkipException
-                    break
-            # quit selected
-            elif accept_quit and key == "q":
-                distance = len(self.choices) - self._line - 1
-                if not self._move_line(distance):
-                    err = TeletypeQuitException
-                    break
             # escape sequences pressed
             elif key in {"ctrl-c", "ctrl-d", "ctrl-z"} | codes.ESCAPE_SEQUENCES:
-                err = TeletypeQuitException
+                err = KeyboardInterrupt("%s pressed" % key)
                 break
         io.show_cursor()
         if self.erase_screen:
             io.erase_screen()
         else:
             io.move_cursor(rows=len(self.choices) - self._line)
-        self._extra_choice__clear()
         if err:
-            raise err
-
-    @property
-    def choices(self):
-        return self._choices + self._extra_choices
+            raise err  # pylint: disable=raising-bad-type
 
     @property
     def highlighted(self):
@@ -217,26 +147,21 @@ class SelectOne(_Select):
         _Select.__init__(self, choices, **config)
         self._col_offset = 2
 
-    def prompt(self, can_skip=False, can_quit=False):
+    def prompt(self):
         """ Displays choices to user and prompts them for their selection
         """
         self._line = 0
         g_cursor = self._get_glyph("arrow")
         if not self.choices:
             return None
-        if can_skip:
-            self._extra_choice__add_skip()
-        if can_quit:
-            self._extra_choice__add_quit()
         if self.erase_screen:
             io.erase_screen()
         if self.header:
-            style = None if self.ascii_mode else "bold"
-            io.style_print(self.header, style=style)
+            print(self.header)
         for i, choice in enumerate(self.choices):
             print(" %s %s" % (g_cursor if i == 0 else " ", choice))
         io.move_cursor(rows=-1 * i - 1)
-        self._get_selection(accept_skip=can_skip, accept_quit=can_quit)
+        self._get_selection()
         return self.highlighted
 
 
@@ -268,12 +193,11 @@ class SelectMany(_Select):
         if self.erase_screen:
             io.erase_screen()
         if self.header:
-            style = None if self.ascii_mode else "bold"
-            io.style_print(self.header, style=style)
+            print(self.header)
         for i, choice in enumerate(self.choices):
             print("%s%s %s " % (" " if i else g_arrow, g_unselected, choice))
         io.move_cursor(rows=-1 * i - 1)
-        self._get_selection(accept_space=True)
+        self._get_selection(multiselect=True)
         return self.selected
 
 
@@ -319,9 +243,67 @@ class ProgressBar(_Component):
         print("\r%s" % line, end="")
 
 
-class Choice(namedtuple("Choice", ("value", "is_dimmed", "use_mnemonic"))):
-    __slots__ = ()
+class Choice(object):
+    def __init__(self, value, label=None, style=None, mnemonic=None):
+        self._idx = -1
+        self._mnemonic = False
+        self._bracketted = False
+        self._str = label or str(value).strip()
+        self.value = value
+        self.label = label
+        style = style or ""
+        self.style = style if isinstance(style, str) else " ".join(style)
+        self.mnemonic = mnemonic
+
+    def __repr__(self):
+        r = "Choice(%r" % self.value
+        if self.label:
+            r += ", %r" % self.label
+        if self.style:
+            r += ", %r" % self.style
+        if self.mnemonic:
+            r += ", %r" % self.mnemonic
+        r += ")"
+        return r
+
+    def __str__(self):
+        if self._idx < 0:
+            s = io.style_format(self._str, self.style)
+        elif self._bracketted:
+            s = "%s[%s]%s" % (
+                self._str[: self._idx],
+                self._str[self._idx],
+                self._str[self._idx + 1 :],
+            )
+            s = io.style_format(s, self.style)
+        else:
+            s = (
+                io.style_format(self._str[: self._idx], self.style)
+                + io.style_format(
+                    self._str[self._idx], "underline " + self.style
+                )
+                + io.style_format(self._str[self._idx + 1 :], self.style)
+            )
+        return s
 
     @property
     def mnemonic(self):
-        return str(self.value).upper() if self.use_mnemonic else None
+        return self._mnemonic
+
+    @mnemonic.setter
+    def mnemonic(self, m):
+        l = len(m) if isinstance(m, str) else 0
+        if not l:
+            self._bracketted = False
+            self._mnemonic = None
+            self._idx = -1
+        elif l == 1:
+            self._mnemonic = m
+            self._bracketted = False
+            self._idx = self._str.lower().find(self.mnemonic.lower())
+        elif l == 3 and m[0] == "[" and m[2] == "]":
+            self._mnemonic = m[1]
+            self._bracketted = True
+            self._idx = self._str.lower().find(self.mnemonic.lower())
+        else:
+            raise ValueError("mnemonic must be None or of form 'x' or '[x]'")
