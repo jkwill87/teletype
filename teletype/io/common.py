@@ -67,7 +67,7 @@ def strip_format(text):
     return sub(r"(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]", "", text)
 
 
-def style_format(text, style):
+def style_format(text, style, reset=True):
     """ Wraps texts in terminal control sequences
 
     Style can be passed as either a collection or space delimited string.
@@ -83,7 +83,9 @@ def style_format(text, style):
         prefix += codes.COLOURS.get(s, "")
         prefix += codes.HIGHLIGHTS.get(s, "")
         prefix += codes.MODES.get(s, "")
-    return prefix + text + codes.MODES["reset"]
+    if reset:
+        text += codes.MODES["reset"]
+    return prefix + text
 
 
 def style_print(*values, **options):
