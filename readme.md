@@ -5,7 +5,7 @@
 
 # teletype
 
-**teletype** is a high-level cross platform tty library compatible with Python 2.7 and 3+. It provides a consistent interface between the terminal and cmd.exe by building on top of [terminfo](https://invisible-island.net/ncurses/terminfo.src.html) and [msvcrt](https://msdn.microsoft.com/en-us/library/abx4dbyh.aspx) and has no dependancies.
+**teletype** is a high-level cross platform tty library compatible with Python 2.7 and 3+. It provides a consistent interface between the terminal and cmd.exe by building on top of [terminfo](https://invisible-island.net/ncurses/terminfo.src.html) and [msvcrt](https://msdn.microsoft.com/en-us/library/abx4dbyh.aspx) and has no dependencies.
 
 
 # Installation
@@ -46,13 +46,16 @@ Lastly, you can use `strip_format` to clear a string of any escape sequences tha
 ```python
 from teletype.io import style_format, style_print, strip_format
 
+
 # All of these will do the same thing, that is print the message in red and bold
 print(style_format("I want to stand out!", "bold red"))
 print(style_format("I want to stand out!", ("red", "bold")))
 style_print("I want to stand out!", style=["red", "bold"])
 
+
 # Styles are cleared afterwards so everything else gets printed normally
 print("I want to be boring")
+
 
 # If for whatever reason you want to unstyle text, thats a thing too
 text = style_format("I don't actually want too be styled", ("red", "bold"))
@@ -71,29 +74,47 @@ The package also includes components, higher level UI classes that are composed 
 ## SelectOne
 
 ```python
-from teletype.components import Select
-
-picker = Select(
-    header="Your Favourite Animal?",
-    choices=["dog", "bird", "cat", "monkey", "gorilla"],
-)
-choice = picker.prompt()
-print("Your choice: " + choice)
+In [1]: from teletype.components import SelectOne
+   ...:
+   ...: picker = SelectOne(
+   ...:     choices=["dog", "bird", "cat", "monkey", "gorilla"],
+   ...:     header="Your Favourite Animal?",
+   ...: )
+   ...: choice = picker.prompt()
+   ...: print("Your choice: " + choice)
 ```
 
-![Output](https://github.com/jkwill87/teletype/blob/master/_assets/select_one.gif)
+```
+Your Favourite Animal?
+ ❱ dog
+   bird
+   cat
+   monkey
+   gorilla
+Your choice: dog
+```
 
 ## SelectMany
 
 ```python
-from teletype.components import SelectMany
+In [2]: from teletype.components import SelectMany
+   ...:
+   ...: picker = SelectMany(
+   ...:     choices=["dog", "bird", "cat", "monkey", "gorilla"],
+   ...:     header="Your Favourite Animals?",
+   ...: )
+   ...: choices = picker.prompt()
+   ...: print("Your choices: " + ", ".join(choices))
+```
 
-picker = SelectMany(
-    header="Your Favourite Animals?",
-    choices=["dog", "bird", "cat", "monkey", "gorilla"],
-)
-choices = picker.prompt()
-print("Your choices: " + ", ".join(choices))
+```
+Your Favourite Animals?
+❱● dog
+ ○ bird
+ ○ cat
+ ○ monkey
+ ○ gorilla
+Your choices: dog
 ```
 
 ![Output](https://github.com/jkwill87/teletype/blob/master/_assets/select_many.gif)
@@ -101,20 +122,62 @@ print("Your choices: " + ", ".join(choices))
 ## ProgressBar
 
 ```python
-from time import sleep
-from teletype.components import ProgressBar
-
-iterations = 15
-
-def iterable():
-    for _ in range(iterations):
-        sleep(0.2)
-        yield
-
-ProgressBar().process(iterable(), iterations)
+In [3]: from time import sleep
+   ...: from teletype.components import ProgressBar
+   ...:
+   ...: iterations = 15
+   ...:
+   ...: def iterable():
+   ...:     for _ in range(iterations):
+   ...:         sleep(0.2)
+   ...:         yield
+   ...:
+   ...: ProgressBar("Progress Bar").process(iterable(), iterations)
 ```
 
-![Output](https://github.com/jkwill87/teletype/blob/master/_assets/progress_bar.gif)
+```
+Progress Bar: 15/15▐████████████████████████████████████████████████▌100%
+```
+
+## ChoiceHelper
+
+Although not a component in and of itself, `ChoiceHelper` can help you wrap your objects to make full use of components like `SelectOne`, `SelectMany`, or `SelectApproval`. This is completely optional-- normally these just use the string representations of objects for display, e.g. just printing options which are strings or calling their underlying `__str__` methods.
+
+### Seperate Values from Labels
+
+Sometimes this isn't an option or you might want to seperate the label of an object from its value. `ChoiceHelper` lets you specifiy these fields explicitly. You can apply styles, too.
+
+```python
+In [4]: from teletype.components import SelectOne, ChoiceHelper
+   ...:
+   ...: choices = [
+   ...:     ChoiceHelper(["corgi", "greyhound", "bulldog"], label="dog", style="blue"),
+   ...:     ChoiceHelper(["siamese", "chartreux", "ragdoll"], label="cat", style="red"),
+   ...:     ChoiceHelper(["zebra", "beta", "gold"], "fish", style="green")
+   ...: ]
+   ...:
+   ...: pet = SelectOne(choices, header="favourite pet").prompt()
+   ...: breed = SelectOne(pet, header="favourite breed").prompt()
+```
+
+```
+favourite pet
+ ❱ dog
+   cat
+   fish
+favourite breed
+ ❱ corgi
+   greyhound
+   bulldog
+
+```
+
+### Mnemonics
+
+Another cool thing that `ChoiceHelper`s let you do is use mneumonics. These can be specified either using a single character, in which case they are underlined, or as a single character wrapped in square brackets, in which case they will be indicated using square brackets (e.g. for compatibility with dumb terminals).
+
+This is used under the hood for `SelectApproval` to quickly select yes by pressing `y` and no by pressing `n`.
+
 
 ## Styling Components (teletype.components.config)
 
@@ -124,14 +187,13 @@ You can set component primary and secondary styles using `set_style`.
 from teletype.components import ProgressBar, SelectMany
 
 config = {"style_primary": "yellow", "style_secondary": "magenta"}
-iterable = range(25)
+steps = 25
+iterable = range(steps)
 choices = (1, 2, 3)
 
-ProgressBar(header="Progress Bar", **config).process(iterable)
+ProgressBar("Progress Bar", **config).process(iterable, steps)
 SelectMany(choices, header="Select Many", **config).prompt()
 ```
-
-![Output](https://github.com/jkwill87/teletype/blob/master/_assets/style.png)
 
 You can also change character sets using `set_char(key, value)` where value is the unicode character you want to use and key is one of:
 
@@ -141,7 +203,7 @@ You can also change character sets using `set_char(key, value)` where value is t
 - block
 - left-edge
 - right-edge
-    
+
 
 # License
 
