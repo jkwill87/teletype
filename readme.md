@@ -163,11 +163,11 @@ favourite pet
  ❱ dog
    cat
    fish
+
 favourite breed
  ❱ corgi
    greyhound
    bulldog
-
 ```
 
 ### Mnemonics
@@ -195,12 +195,12 @@ SelectMany(choices, header="Select Many", **config).prompt()
 
 You can also change character sets using `set_char(key, value)` where value is the unicode character you want to use and key is one of:
 
-- selected
-- unselected
-- arrow
-- block
-- left-edge
-- right-edge
+- `arrow`
+- `block`
+- `left-edge`
+- `right-edge`
+- `selected`
+- `unselected`
 
 
 # License
