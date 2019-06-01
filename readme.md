@@ -117,8 +117,6 @@ Your Favourite Animals?
 Your choices: dog
 ```
 
-![Output](https://github.com/jkwill87/teletype/blob/master/_assets/select_many.gif)
-
 ## ProgressBar
 
 ```python
