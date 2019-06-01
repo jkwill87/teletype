@@ -3,26 +3,42 @@
 from __future__ import print_function
 
 import os
+from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 
 from teletype import codes, io
 
-__all__ = ["SelectOne", "SelectApproval", "SelectMany", "ProgressBar", "Choice"]
+__all__ = [
+    "SelectOne",
+    "SelectApproval",
+    "SelectMany",
+    "ProgressBar",
+    "ChoiceHelper",
+]
+
+_AbstractClass = ABCMeta("ABC", (object,), {"__slots__": ()})
 
 
-class _Component(object):
+class _Component(_AbstractClass):
     """ Base class for all components
     """
 
-    def __init__(self, **config):
-        self._backups = ()
-        self.display_chars = config.get(
-            "display_chars", deepcopy(codes.DEFAULT_CHARS)
-        )
-        self.erase_screen = config.get("erase_screen", False)
-        self.header = config.get("header", "").strip()
-        self.style_primary = config.get("style_primary", "green")
-        self.style_secondary = config.get("style_secondary", "dark green")
+    def __init__(
+        self,
+        header,
+        style_primary="green",
+        style_secondary="dark green",
+        display_chars=None,
+        erase_screen=False,
+    ):
+        self.header = header
+        self.style_primary = style_primary
+        self.style_secondary = style_secondary
+        self.display_chars = display_chars or deepcopy(codes.DEFAULT_CHARS)
+        self.erase_screen = erase_screen
+
+    def __str__(self):
+        return io.strip_format(self.header)
 
     def _get_char_category(self, key):
         for category, d in self.display_chars.items():
@@ -54,17 +70,38 @@ class _Select(_Component):
     """ Base class for selection components
     """
 
-    def __init__(self, choices, **config):
-        _Component.__init__(self, **config)
-        unique_choices = set()
+    _multiselect = False
+
+    def __init__(
+        self,
+        choices,
+        header,
+        style_primary="green",
+        style_secondary="dark green",
+        display_chars=None,
+        erase_screen=False,
+    ):
+        _Component.__init__(
+            self,
+            header,
+            style_primary,
+            style_secondary,
+            display_chars,
+            erase_screen,
+        )
         self.choices = []
+        self._mnemonics = {}
         for choice in choices:
-            if choice not in unique_choices:
-                unique_choices.add(choice)
-                self.choices.append(choice)
+            if choice in self.choices:
+                continue
+            self.choices.append(choice)
+            if isinstance(choice, ChoiceHelper) and choice.mnemonic:
+                self._mnemonics[choice.mnemonic] = len(self._mnemonics)
         self._line = 0
         self._selected_lines = set()
-        self._col_offset = 1
+
+    def __len__(self):
+        return len(self.choices)
 
     def _select_line(self):
         self._selected_lines ^= {self._line}
@@ -77,141 +114,159 @@ class _Select(_Component):
         io.move_cursor(cols=-2)
 
     def _move_line(self, distance):
-        # col_offset logic is used to properly clear whitespace before choices
+        col_offset = 1 if self._multiselect else 2
         g_cursor = self._get_glyph("arrow")
         offset = (self._line + distance) % len(self.choices) - self._line
         if offset == 0:
             return 0
         self._line += offset
-        print(" " * self._col_offset, end="")
-        io.move_cursor(rows=offset, cols=-self._col_offset)
-        print("%s%s" % (" " * (self._col_offset - 1), g_cursor), end="")
-        io.move_cursor(cols=-self._col_offset)
+        print(" " * col_offset, end="")
+        io.move_cursor(rows=offset, cols=-col_offset)
+        print("%s%s" % (" " * (col_offset - 1), g_cursor), end="")
+        io.move_cursor(cols=-col_offset)
         return offset
 
-    def _get_selection(self, multiselect=False):
-        io.hide_cursor()
-        err = None
+    def _process_keypress(self):
         while True:
             key = io.get_key()
-            # navigation key pressed
-            if key in {"up", "k"}:
+            # navigation key pressed; vim keys allowed when mnemonics not in use
+            if key == "up" or (key == "k" and not self._mnemonics):
                 self._move_line(-1)
-            elif key in {"down", "j"}:
+            elif key == "down" or (key == "j" and not self._mnemonics):
                 self._move_line(1)
             # space pressed
-            elif multiselect and key == "space":
+            elif self._multiselect and key == "space":
                 self._select_line()
             # enter pressed
             elif key in ("lf", "nl"):
                 break
+            # mnemonic pressed
+            elif self._mnemonics.get(key) is not None:
+                distance = self._mnemonics[key] - self._line
+                self._move_line(distance)
+                if distance == 0:
+                    # on second keypress...
+                    if self._multiselect:
+                        self._select_line()
+                    else:
+                        break
             # escape sequences pressed
             elif key in {"ctrl-c", "ctrl-d", "ctrl-z"} | codes.ESCAPE_SEQUENCES:
-                err = KeyboardInterrupt("%s pressed" % key)
-                break
-        io.show_cursor()
-        if self.erase_screen:
-            io.erase_screen()
-        else:
-            io.move_cursor(rows=len(self.choices) - self._line)
-        if err:
-            raise err  # pylint: disable=raising-bad-type
+                raise KeyboardInterrupt("%s pressed" % key)
+
+    @staticmethod
+    def _strip_choice(choice):
+        if isinstance(choice, str):
+            return io.strip_format(choice)
+        if isinstance(choice, ChoiceHelper):
+            return choice.value
+        return choice
 
     @property
     def highlighted(self):
         """ Returns the value for the currently highlighted choice
         """
         choice = self.choices[self._line % len(self.choices)]
-        if isinstance(choice, str):
-            choice = io.strip_format(choice)
-        return choice
+        return self._strip_choice(choice)
 
     @property
     def selected(self):
         """ Returns the values for all currently selected choices
         """
         return tuple(
-            self.choices[line % len(self.choices)]
+            self._strip_choice(self.choices[line % len(self.choices)])
             for line in self._selected_lines
         )
 
-
-class SelectOne(_Select):
-    """ Allows the user to make a single selection
-
-    - Use arrow keys or 'j' and 'k' to highlight selection
-    - Use return key to submit
-    """
-
-    def __init__(self, choices, **config):
-        _Select.__init__(self, choices, **config)
-        self._col_offset = 2
-
     def prompt(self):
-        """ Displays choices to user and prompts them for their selection
-        """
         self._line = 0
-        g_cursor = self._get_glyph("arrow")
+        self._selected_lines = set()
         if not self.choices:
             return None
         if self.erase_screen:
             io.erase_screen()
         if self.header:
             print(self.header)
+        i = 0
         for i, choice in enumerate(self.choices):
-            print(" %s %s" % (g_cursor if i == 0 else " ", choice))
+            self._display_choice(i, choice)
         io.move_cursor(rows=-1 * i - 1)
-        self._get_selection()
-        return self.highlighted
+        io.hide_cursor()
+        try:
+            self._process_keypress()
+        finally:
+            io.show_cursor()
+            if self.erase_screen:
+                io.erase_screen()
+            else:
+                io.move_cursor(rows=len(self.choices) - self._line)
+        return self.selected if self._multiselect else self.highlighted
+
+    @abstractmethod
+    def _display_choice(self, idx, choice):
+        pass
+
+
+class SelectOne(_Select):
+    """ Allows the user to make a single selection
+
+    - Use arrow keys or 'j' and 'k' to highlight selection
+    - Press mnemonic keys to move to ChoiceHelper, another time to submit
+    - Use return key to submit
+    """
+
+    _multiselect = False
+
+    def _display_choice(self, idx, choice):
+        g_arrow = self._get_glyph("arrow")
+        print(" %s %s" % (g_arrow if idx == 0 else " ", choice))
 
 
 class SelectApproval(SelectOne):
     """ Simple extension of SelectOne offering the option of selecting yes or no
     """
 
-    def __init__(self, **config):
-        SelectOne.__init__(self, ("yes", "no"), **config)
+    def __init__(
+        self,
+        header,
+        style_primary="green",
+        style_secondary="dark green",
+        display_chars=None,
+        erase_screen=False,
+    ):
+        yes = ChoiceHelper(True, "yes", None, "y")
+        no = ChoiceHelper(False, "no", None, "n")
+        SelectOne.__init__(
+            self,
+            (yes, no),
+            header,
+            style_primary,
+            style_secondary,
+            display_chars,
+            erase_screen,
+        )
 
 
 class SelectMany(_Select):
     """ Allows users to select multiple items using
 
     - Use arrow keys or 'j' and 'k' to highlight selection
+    - Press mnemonic keys to move to ChoiceHelper, another time to toggle
     - Use space key to toggle selection
     - Use return key to submit
     """
 
-    def prompt(self):
-        """ Displays choices to user and prompts them for their selection(s)
-        """
-        self._line = 0
-        self._selected_lines = set()
+    _multiselect = True
+
+    def _display_choice(self, idx, choice):
         g_arrow = self._get_glyph("arrow")
         g_unselected = self._get_glyph("unselected")
-        if not self.choices:
-            return tuple()
-        if self.erase_screen:
-            io.erase_screen()
-        if self.header:
-            print(self.header)
-        for i, choice in enumerate(self.choices):
-            print("%s%s %s " % (" " if i else g_arrow, g_unselected, choice))
-        io.move_cursor(rows=-1 * i - 1)
-        self._get_selection(multiselect=True)
-        return self.selected
+        print("%s%s %s " % (" " if idx else g_arrow, g_unselected, choice))
 
 
 class ProgressBar(_Component):
     """ Displays a progress bar
     """
-
-    def __init__(self, **config):
-        _Component.__init__(self, **config)
-        try:
-            # Python 3.3+ only
-            self.width = config.get("width", os.get_terminal_size().columns)
-        except (AttributeError, OSError):
-            self.width = 80
 
     def process(self, iterable, steps):
         """ Iterates over an object, updating the progress bar on each iteration
@@ -231,19 +286,28 @@ class ProgressBar(_Component):
         g_block = self._get_glyph("block")
         g_l_edge = self._get_glyph("left-edge")
         g_r_edge = self._get_glyph("right-edge")
+        try:
+            # Python 3.3+ only
+            width = os.get_terminal_size().columns
+        except (AttributeError, OSError):
+            width = 80
+
         prefix = ""
         if self.header:
             prefix += "%s: " % io.style_format(self.header, "bold")
         format_specifier = "%%0%dd" % len(str(steps))
         prefix += "%s/%d%s" % (format_specifier % step, steps, g_l_edge)
         suffix = g_r_edge + "%03d%%" % (step / steps * 100)
-        units_total = max(self.width - len(io.strip_format(prefix + suffix)), 5)
+        units_total = max(width - len(io.strip_format(prefix + suffix)), 5)
         units = units_total * step // steps
         line = prefix + units * g_block + (units_total - units) * " " + suffix
         print("\r%s" % line, end="")
 
 
-class Choice(object):
+class ChoiceHelper(object):
+    """ Helper class for packaging and displaying objects as choices
+    """
+
     def __init__(self, value, label=None, style=None, mnemonic=None):
         self._idx = -1
         self._mnemonic = False
@@ -256,7 +320,7 @@ class Choice(object):
         self.mnemonic = mnemonic
 
     def __repr__(self):
-        r = "Choice(%r" % self.value
+        r = "ChoiceHelper(%r" % self.value
         if self.label:
             r += ", %r" % self.label
         if self.style:
