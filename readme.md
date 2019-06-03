@@ -76,10 +76,8 @@ The package also includes components, higher level UI classes that are composed 
 ```python
 In [1]: from teletype.components import SelectOne
    ...:
-   ...: picker = SelectOne(
-   ...:     choices=["dog", "bird", "cat", "monkey", "gorilla"],
-   ...:     header="Your Favourite Animal?",
-   ...: )
+   ...: picker = SelectOne(choices=["dog", "bird", "cat", "monkey", "gorilla"])
+   ...: print("Your Favourite Animal?")
    ...: choice = picker.prompt()
    ...: print("Your choice: " + choice)
 ```
@@ -99,10 +97,8 @@ Your choice: dog
 ```python
 In [2]: from teletype.components import SelectMany
    ...:
-   ...: picker = SelectMany(
-   ...:     choices=["dog", "bird", "cat", "monkey", "gorilla"],
-   ...:     header="Your Favourite Animals?",
-   ...: )
+   ...: picker = SelectMany(choices=["dog", "bird", "cat", "monkey", "gorilla"])
+   ...: print("Your Favourite Animals?")
    ...: choices = picker.prompt()
    ...: print("Your choices: " + ", ".join(choices))
 ```
@@ -154,8 +150,11 @@ In [4]: from teletype.components import SelectOne, ChoiceHelper
    ...:     ChoiceHelper(["zebra", "beta", "gold"], "fish", style="green")
    ...: ]
    ...:
-   ...: pet = SelectOne(choices, header="favourite pet").prompt()
-   ...: breed = SelectOne(pet, header="favourite breed").prompt()
+   ...: print("favourite pet")
+   ...: pet = SelectOne(choices).prompt()
+   ...:
+   ...: print("favourite breed")
+   ...: breed = SelectOne(pet).prompt()
 ```
 
 ```
@@ -176,21 +175,20 @@ Another cool thing that `ChoiceHelper`s let you do is use mneumonics. These can 
 
 This is used under the hood for `SelectApproval` to quickly select yes by pressing `y` and no by pressing `n`.
 
-
 ## Styling Components (teletype.components.config)
 
-You can set component primary and secondary styles using `set_style`.
+You can set component styles using `io.style_format`.
 
 ```python
+from teletype.io import style_format, style_print
 from teletype.components import ProgressBar, SelectMany
 
-config = {"style_primary": "yellow", "style_secondary": "magenta"}
-steps = 25
-iterable = range(steps)
-choices = (1, 2, 3)
+style = "red bold"
+arrow = io.style_format(CHARS_DEFAULT["arrow"], style)
+choices = ["dogs", "cats", "fish"]
 
-ProgressBar("Progress Bar", **config).process(iterable, steps)
-SelectMany(choices, header="Select Many", **config).prompt()
+io.style_print("\nSelect One", style=style)
+SelectOne(choices, arrow=arrow).prompt()
 ```
 
 You can also change character sets using `set_char(key, value)` where value is the unicode character you want to use and key is one of:

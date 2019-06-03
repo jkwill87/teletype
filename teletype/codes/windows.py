@@ -2,16 +2,19 @@
 
 from ctypes import windll
 
-__all__ = ["DEFAULT_CHARS", "SCAN_CODES"]
+__all__ = ["CHARS_DEFAULT", "SCAN_CODES"]
 
 # Allows Windows 10 Anniversary (build>=16257) to use VT100 Codes
 # https://docs.microsoft.com/windows/console/console-virtual-terminal-sequences
 windll.kernel32.SetConsoleMode(windll.kernel32.GetStdHandle(-11), 1 | 2 | 4 | 8)
 
-DEFAULT_CHARS = {
-    "primary": {"selected": u"●", "block": u"█"},
-    "secondary": {"arrow": u"►", "left-edge": u"▐", "right-edge": u"▌"},
-    "plain": {"unselected": u"○"},
+CHARS_DEFAULT = {
+    "arrow": u"►",
+    "block": u"█",
+    "left-edge": u"▐",
+    "right-edge": u"▌",
+    "selected": u"●",
+    "unselected": u"○",
 }
 
 SCAN_CODES = {

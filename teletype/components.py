@@ -3,8 +3,6 @@
 from __future__ import print_function
 
 import os
-from abc import ABCMeta, abstractmethod
-from copy import deepcopy
 
 from teletype import codes, io
 
@@ -16,80 +14,21 @@ __all__ = [
     "ChoiceHelper",
 ]
 
-_AbstractClass = ABCMeta("ABC", (object,), {"__slots__": ()})
 
+class SelectOne(object):
+    """ Allows the user to make a single selection
 
-class _Component(_AbstractClass):
-    """ Base class for all components
-    """
-
-    def __init__(
-        self,
-        header,
-        style_primary="green",
-        style_secondary="dark green",
-        display_chars=None,
-        erase_screen=False,
-    ):
-        self.header = header
-        self.style_primary = style_primary
-        self.style_secondary = style_secondary
-        self.display_chars = display_chars or deepcopy(codes.DEFAULT_CHARS)
-        self.erase_screen = erase_screen
-
-    def __str__(self):
-        return io.strip_format(self.header)
-
-    def _get_char_category(self, key):
-        for category, d in self.display_chars.items():
-            if key in d.keys():
-                return category
-        raise KeyError
-
-    def _get_glyph(self, key):
-        category = self._get_char_category(key)
-        if not category:
-            raise KeyError
-        glyph = self.display_chars[category][key]
-        if category == "primary":
-            glyph = io.style_format(glyph, self.style_primary)
-        elif category == "secondary":
-            glyph = io.style_format(glyph, self.style_secondary)
-        return glyph
-
-    def char_set(self, key, value):
-        """ Updates charters used to render components.
-        """
-        category = self._get_char_category(key)
-        if not category:
-            raise KeyError
-        self.display_chars[category][key] = value
-
-
-class _Select(_Component):
-    """ Base class for selection components
+    - Use arrow keys or 'j' and 'k' to highlight selection
+    - Press mnemonic keys to move to ChoiceHelper, another time to submit
+    - Use return key to submit
     """
 
     _multiselect = False
 
-    def __init__(
-        self,
-        choices,
-        header,
-        style_primary="green",
-        style_secondary="dark green",
-        display_chars=None,
-        erase_screen=False,
-    ):
-        _Component.__init__(
-            self,
-            header,
-            style_primary,
-            style_secondary,
-            display_chars,
-            erase_screen,
-        )
+    def __init__(self, choices, **chars):
         self.choices = []
+        self.chars = codes.CHARS_DEFAULT.copy()
+        self.chars.update(chars)
         self._mnemonics = {}
         for choice in choices:
             if choice in self.choices:
@@ -103,19 +42,22 @@ class _Select(_Component):
     def __len__(self):
         return len(self.choices)
 
+    def _display_choice(self, idx, choice):
+        print(" %s %s" % (self.chars["arrow"] if idx == 0 else " ", choice))
+
     def _select_line(self):
         self._selected_lines ^= {self._line}
         io.move_cursor(cols=1)
         if self._line in self._selected_lines:
-            glyph = self._get_glyph("selected")
+            char = self.chars["selected"]
         else:
-            glyph = self._get_glyph("unselected")
-        print(glyph, end="")
+            char = self.chars["unselected"]
+        print(char, end="")
         io.move_cursor(cols=-2)
 
     def _move_line(self, distance):
         col_offset = 1 if self._multiselect else 2
-        g_cursor = self._get_glyph("arrow")
+        g_cursor = self.chars["arrow"]
         offset = (self._line + distance) % len(self.choices) - self._line
         if offset == 0:
             return 0
@@ -183,10 +125,6 @@ class _Select(_Component):
         self._selected_lines = set()
         if not self.choices:
             return None
-        if self.erase_screen:
-            io.erase_screen()
-        if self.header:
-            print(self.header)
         i = 0
         for i, choice in enumerate(self.choices):
             self._display_choice(i, choice)
@@ -196,58 +134,21 @@ class _Select(_Component):
             self._process_keypress()
         finally:
             io.show_cursor()
-            if self.erase_screen:
-                io.erase_screen()
-            else:
-                io.move_cursor(rows=len(self.choices) - self._line)
+            io.move_cursor(rows=len(self.choices) - self._line)
         return self.selected if self._multiselect else self.highlighted
-
-    @abstractmethod
-    def _display_choice(self, idx, choice):
-        pass
-
-
-class SelectOne(_Select):
-    """ Allows the user to make a single selection
-
-    - Use arrow keys or 'j' and 'k' to highlight selection
-    - Press mnemonic keys to move to ChoiceHelper, another time to submit
-    - Use return key to submit
-    """
-
-    _multiselect = False
-
-    def _display_choice(self, idx, choice):
-        g_arrow = self._get_glyph("arrow")
-        print(" %s %s" % (g_arrow if idx == 0 else " ", choice))
 
 
 class SelectApproval(SelectOne):
     """ Simple extension of SelectOne offering the option of selecting yes or no
     """
 
-    def __init__(
-        self,
-        header,
-        style_primary="green",
-        style_secondary="dark green",
-        display_chars=None,
-        erase_screen=False,
-    ):
+    def __init__(self, **chars):
         yes = ChoiceHelper(True, "yes", None, "y")
         no = ChoiceHelper(False, "no", None, "n")
-        SelectOne.__init__(
-            self,
-            (yes, no),
-            header,
-            style_primary,
-            style_secondary,
-            display_chars,
-            erase_screen,
-        )
+        SelectOne.__init__(self, (yes, no), **chars)
 
 
-class SelectMany(_Select):
+class SelectMany(SelectOne):
     """ Allows users to select multiple items using
 
     - Use arrow keys or 'j' and 'k' to highlight selection
@@ -259,14 +160,22 @@ class SelectMany(_Select):
     _multiselect = True
 
     def _display_choice(self, idx, choice):
-        g_arrow = self._get_glyph("arrow")
-        g_unselected = self._get_glyph("unselected")
-        print("%s%s %s " % (" " if idx else g_arrow, g_unselected, choice))
+        s = "%s%s %s " % (
+            " " if idx else self.chars["arrow"],
+            self.chars["unselected"],
+            choice,
+        )
+        print(s)
 
 
-class ProgressBar(_Component):
+class ProgressBar(object):
     """ Displays a progress bar
     """
+
+    def __init__(self, label, width=None, **chars):
+        self.label = label
+        self.width = width
+        self.chars = chars
 
     def process(self, iterable, steps):
         """ Iterates over an object, updating the progress bar on each iteration
@@ -283,24 +192,28 @@ class ProgressBar(_Component):
     def update(self, step, steps):
         """ Manually updates the progress bar
         """
-        g_block = self._get_glyph("block")
-        g_l_edge = self._get_glyph("left-edge")
-        g_r_edge = self._get_glyph("right-edge")
         try:
             # Python 3.3+ only
-            width = os.get_terminal_size().columns
+            width = self.width or os.get_terminal_size().columns
         except (AttributeError, OSError):
             width = 80
 
-        prefix = ""
-        if self.header:
-            prefix += "%s: " % io.style_format(self.header, "bold")
+        prefix = "%s: " % io.style_format(self.label, "bold")
         format_specifier = "%%0%dd" % len(str(steps))
-        prefix += "%s/%d%s" % (format_specifier % step, steps, g_l_edge)
-        suffix = g_r_edge + "%03d%%" % (step / steps * 100)
+        prefix += "%s/%d%s" % (
+            format_specifier % step,
+            steps,
+            self.chars["left-edge"],
+        )
+        suffix = self.chars["right-edge"] + "%03d%%" % (step / steps * 100)
         units_total = max(width - len(io.strip_format(prefix + suffix)), 5)
         units = units_total * step // steps
-        line = prefix + units * g_block + (units_total - units) * " " + suffix
+        line = (
+            prefix
+            + units * self.chars["block"]
+            + (units_total - units) * " "
+            + suffix
+        )
         print("\r%s" % line, end="")
 
 

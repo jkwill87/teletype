@@ -1,7 +1,10 @@
 # coding=utf-8
 
-DEFAULT_CHARS = {
-    "primary": {"arrow": u"❱", "block": u"█"},
-    "secondary": {"selected": u"●", "left-edge": u"▐", "right-edge": u"▌"},
-    "plain": {"unselected": u"○"},
+CHARS_DEFAULT = {
+    "arrow": u"❱",
+    "block": u"█",
+    "left-edge": u"▐",
+    "right-edge": u"▌",
+    "selected": u"●",
+    "unselected": u"○",
 }

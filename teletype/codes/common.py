@@ -1,9 +1,12 @@
 # coding=utf-8
 
-ASCII_CHARS = {
-    "primary": {"selected": "*", "block": "#"},
-    "secondary": {"arrow": ">", "left-edge": "|", "right-edge": "|"},
-    "plain": {"unselected": "."},
+CHARS_ASCII = {
+    "arrow": ">",
+    "block": "#",
+    "left-edge": "|",
+    "right-edge": "|",
+    "selected": "*",
+    "unselected": ".",
 }
 
 COLOURS = {
