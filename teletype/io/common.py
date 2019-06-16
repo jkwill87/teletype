@@ -31,6 +31,7 @@ def erase_screen():
     """ Clears all text from the screen
     """
     print(codes.CURSOR["clear"], end="")
+    stdout.flush()
 
 
 def move_cursor(cols=0, rows=0):
@@ -53,12 +54,14 @@ def show_cursor():
     """ Shows the cursor indicator
     """
     print(codes.CURSOR["show"], end="")
+    stdout.flush()
 
 
 def hide_cursor():
     """ Hides the cursor indicator; remember to call show_cursor before exiting
     """
     print(codes.CURSOR["hide"], end="")
+    stdout.flush()
 
 
 def strip_format(text):
