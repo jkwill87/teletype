@@ -84,9 +84,12 @@ class SelectOne(object):
                 break
             # mnemonic pressed
             elif self._mnemonics.get(key) is not None:
-                distance = self._mnemonics[key] - self._line
-                self._move_line(distance)
-                if distance == 0:
+                choice_count = len(self.choices)
+                mnemonic_count = len(self._mnemonics)
+                mnemonic_idx = self._mnemonics[key]
+                dist = choice_count - mnemonic_count - self._line + mnemonic_idx
+                self._move_line(dist)
+                if dist == 0:
                     # on second keypress...
                     if self._multiselect:
                         self._select_line()
