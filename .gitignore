@@ -1,4 +1,3 @@
-__main__.py
 __pycache__/
 .coverage
 .DS_Store
@@ -12,5 +11,4 @@ __pycache__/
 build
 dist/
 MANIFEST
-test*
 venv*
