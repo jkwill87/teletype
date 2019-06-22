@@ -211,7 +211,7 @@ def demo():
         suite |= tests_components
     if "all" in argv:
         suite = tests_codes | tests_components | tests_io
-    for i, fn in enumerate(suite, 1):
+    for i, fn in enumerate(sorted(suite, key=lambda fn: fn.__name__), 1):
         prefix = "== RUNNING TEST {}: {} ".format(i, fn.__name__)
         suffix = "=" * (80 - len(prefix))
         print("\n{}{}\n".format(prefix, suffix))
