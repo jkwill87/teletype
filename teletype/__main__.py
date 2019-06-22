@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# coding=utf-8
 
 """USAGE: python -m teletype [codes|components|io]
 
@@ -22,12 +22,12 @@ except NameError:
 
 def demo_codes_chars_ascii():
     for key, value in codes.CHARS_ASCII.items():
-        print("'{}' .. {}".format(value, key))
+        print(u"'{}' .. {}".format(value, key))
 
 
 def demo_codes_chars_default():
     for key, value in codes.CHARS_DEFAULT.items():
-        print("'{}' .. {}".format(value, key))
+        print(u"'{}' .. {}".format(value, key))
 
 
 def demo_codes_colours():
@@ -39,14 +39,14 @@ def demo_codes_colours():
 def demo_codes_highlights():
     RESET = codes.MODES["reset"]
     for key, value in codes.HIGHLIGHTS.items():
-        print("{}{}{} .. {}".format(value, "/" * 10, RESET, key))
+        print(u"{}{}{} .. {}".format(value, "/" * 10, RESET, key))
 
 
 def demo_codes_modes():
     modes_copy = codes.MODES.copy()
     RESET = modes_copy.pop("reset")
     for key, value in modes_copy.items():
-        print("{}{}{} .. {}".format(value, "/" * 10, RESET, key))
+        print(u"{}{}{} .. {}".format(value, "/" * 10, RESET, key))
 
 
 # IO ---------------------------------------------------------------------------
