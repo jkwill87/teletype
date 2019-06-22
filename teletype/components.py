@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from __future__ import print_function
+from __future__ import print_function, division
 
 import os
 
@@ -178,7 +178,8 @@ class ProgressBar(object):
     def __init__(self, label, width=None, **chars):
         self.label = label
         self.width = width
-        self.chars = chars
+        self.chars = codes.CHARS_DEFAULT.copy()
+        self.chars.update(chars)
 
     def process(self, iterable, steps):
         """ Iterates over an object, updating the progress bar on each iteration
@@ -190,7 +191,6 @@ class ProgressBar(object):
             if step % skip_count == 0 or step == steps:
                 self.update(step, steps)
         io.show_cursor()
-        print()
 
     def update(self, step, steps):
         """ Manually updates the progress bar
@@ -201,7 +201,7 @@ class ProgressBar(object):
         except (AttributeError, OSError):
             width = 80
 
-        prefix = "%s: " % io.style_format(self.label, "bold")
+        prefix = "%s: " % self.label
         format_specifier = "%%0%dd" % len(str(steps))
         prefix += "%s/%d%s" % (
             format_specifier % step,
@@ -217,7 +217,8 @@ class ProgressBar(object):
             + (units_total - units) * " "
             + suffix
         )
-        print("\r%s" % line, end="")
+        io.erase_lines()
+        print("\r%s" % line)
 
 
 class ChoiceHelper(object):
