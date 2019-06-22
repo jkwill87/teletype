@@ -25,6 +25,7 @@ def erase_lines(n=1):
     for _ in range(n):
         print(codes.CURSOR["up"], end="")
         print(codes.CURSOR["eol"], end="")
+    stdout.flush()
 
 
 def erase_screen():
