@@ -216,12 +216,20 @@ def demo():
     }
 
     suite = set()
+    if "selectone" in argv:
+        suite.add(demo_components_selectone)
+    if "selectapproval" in argv:
+        suite.add(demo_components_selectapproval)
+    if "selectmany" in argv:
+        suite.add(demo_components_selectmany)
+    if "progressbar" in argv:
+        suite.add(demo_components_progressbar)
+    if "components" in argv:
+        suite |= tests_components
     if "codes" in argv:
         suite |= tests_codes
     if "io" in argv:
         suite |= tests_io
-    if "components" in argv:
-        suite |= tests_components
     if "all" in argv:
         suite = tests_codes | tests_components | tests_io
     for i, fn in enumerate(sorted(suite, key=lambda fn: fn.__name__), 1):
