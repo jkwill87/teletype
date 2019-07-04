@@ -26,14 +26,14 @@ class SelectOne(object):
     _multiselect = False
 
     def __init__(self, choices, **chars):
-        self.choices = []
         self.chars = codes.CHARS_DEFAULT.copy()
         self.chars.update(chars)
         self._mnemonics = {}
+        self._choices = []
         for choice in choices:
-            if choice in self.choices:
+            if choice in self._choices:
                 continue
-            self.choices.append(choice)
+            self._choices.append(choice)
             if isinstance(choice, ChoiceHelper) and choice.mnemonic:
                 self._mnemonics[choice.mnemonic] = len(self._mnemonics)
         self._line = 0
@@ -41,6 +41,9 @@ class SelectOne(object):
 
     def __len__(self):
         return len(self.choices)
+
+    def __hash__(self):
+        return self.choices.__hash__()
 
     def _display_choice(self, idx, choice):
         print(" %s %s" % (self.chars["arrow"] if idx == 0 else " ", choice))
@@ -106,6 +109,12 @@ class SelectOne(object):
         if isinstance(choice, ChoiceHelper):
             return choice.value
         return choice
+
+    @property
+    def choices(self):
+        """ Returns read-only tuple of choices
+        """
+        return tuple(self._choices)
 
     @property
     def highlighted(self):
@@ -273,16 +282,16 @@ class ChoiceHelper(object):
 
     @mnemonic.setter
     def mnemonic(self, m):
-        l = len(m) if isinstance(m, str) else 0
-        if not l:
+        line_len = len(m) if isinstance(m, str) else 0
+        if not line_len:
             self._bracketed = False
             self._mnemonic = None
             self._idx = -1
-        elif l == 1:
+        elif line_len == 1:
             self._mnemonic = m
             self._bracketed = False
             self._idx = self._str.lower().find(self.mnemonic.lower())
-        elif l == 3 and m[0] == "[" and m[2] == "]":
+        elif line_len == 3 and m[0] == "[" and m[2] == "]":
             self._mnemonic = m[1]
             self._bracketed = True
             self._idx = self._str.lower().find(self.mnemonic.lower())
