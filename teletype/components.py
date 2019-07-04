@@ -227,13 +227,13 @@ class ChoiceHelper(object):
 
     def __init__(self, value, label=None, style=None, mnemonic=None):
         self._idx = -1
-        self._mnemonic = False
-        self._bracketted = False
+        self._bracketed = False
         self._str = label or str(value).strip()
         self.value = value
         self.label = label
         style = style or ""
         self.style = style if isinstance(style, str) else " ".join(style)
+        self._mnemonic = ""
         self.mnemonic = mnemonic
 
     def __repr__(self):
@@ -250,7 +250,7 @@ class ChoiceHelper(object):
     def __str__(self):
         if self._idx < 0:
             s = io.style_format(self._str, self.style)
-        elif self._bracketted:
+        elif self._bracketed:
             s = "%s[%s]%s" % (
                 self._str[: self._idx],
                 self._str[self._idx],
@@ -275,16 +275,18 @@ class ChoiceHelper(object):
     def mnemonic(self, m):
         l = len(m) if isinstance(m, str) else 0
         if not l:
-            self._bracketted = False
+            self._bracketed = False
             self._mnemonic = None
             self._idx = -1
         elif l == 1:
             self._mnemonic = m
-            self._bracketted = False
+            self._bracketed = False
             self._idx = self._str.lower().find(self.mnemonic.lower())
         elif l == 3 and m[0] == "[" and m[2] == "]":
             self._mnemonic = m[1]
-            self._bracketted = True
+            self._bracketed = True
             self._idx = self._str.lower().find(self.mnemonic.lower())
         else:
             raise ValueError("mnemonic must be None or of form 'x' or '[x]'")
+        if self._mnemonic not in (self.label or str(self.value)):
+            raise ValueError("mnemonic not present in value or label")
