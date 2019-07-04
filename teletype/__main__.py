@@ -105,6 +105,19 @@ def demo_components_selectone():
     print("choice = {}\n".format(choice))
 
     print("ChoiceHelper")
+    one = components.ChoiceHelper(1, None, "blue", "1")
+    two = components.ChoiceHelper(2, None, "cyan", "2")
+    three = components.ChoiceHelper(3, None, "green", "3")
+    four = components.ChoiceHelper(4, None, "grey", "4")
+    five = components.ChoiceHelper(5, None, "magenta", "5")
+    six = components.ChoiceHelper(6, None, "red", "6")
+    seven = components.ChoiceHelper(7, None, "yellow", "7")
+    choice = components.SelectOne(
+        (one, two, three, four, five, six, seven)
+    ).prompt()
+    print("choice = {}\n".format(choice))
+
+    print("ChoiceHelper label")
     five = components.ChoiceHelper(5, "five", "red bold", "f")
     six = components.ChoiceHelper(6, "six", "yellow italic", "[s]")
     choice = components.SelectOne((five, six)).prompt()
