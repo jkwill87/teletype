@@ -112,7 +112,7 @@ def demo_components_selectone():
 
 
 def demo_components_selectapproval():
-    choice = components.SelectApproval()
+    choice = components.SelectApproval().prompt()
     print("choice = {}".format(choice))
 
 
