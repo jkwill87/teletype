@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 from teletype import VERSION
 
-with open("readme.md", "r") as fp:
+with open("readme.md", "r", encoding="utf8") as fp:
     LONG_DESCRIPTION = fp.read()
 
 setup(
