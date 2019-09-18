@@ -72,7 +72,7 @@ KEYS = {
     "lf": "\r",
     "cr": "\n",
     "space": " ",
-    "backspace": "\b",
+    "backspace": "\x08",
     "ctrl-a": "\x01",
     "ctrl-b": "\x02",
     "ctrl-c": "\x03",
