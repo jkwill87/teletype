@@ -282,6 +282,9 @@ class ChoiceHelper(object):
 
     @mnemonic.setter
     def mnemonic(self, m):
+        if not m:
+            self._mnemonic = None
+            return
         line_len = len(m) if isinstance(m, str) else 0
         if not line_len:
             self._bracketed = False
