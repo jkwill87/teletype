@@ -4,6 +4,6 @@ from os import name as os_name
 
 __all__ = ["VERSION", "IS_WINDOWS"]
 
-VERSION = "1.0.3"
+VERSION = "1.0.4"
 
 IS_WINDOWS = os_name in ("nt", "cygwin")
