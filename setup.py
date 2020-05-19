@@ -2,7 +2,7 @@
 
 from setuptools import find_packages, setup
 
-from teletype import VERSION
+from teletype.__version__ import VERSION
 
 with open("readme.md", "r") as fp:
     LONG_DESCRIPTION = fp.read()
