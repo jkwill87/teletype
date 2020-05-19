@@ -7,6 +7,11 @@ from sys import stdout
 
 from teletype import codes
 
+try:
+    input = raw_input
+except NameError:
+    pass
+
 __all__ = [
     "erase_lines",
     "erase_screen",
@@ -16,6 +21,7 @@ __all__ = [
     "strip_format",
     "style_format",
     "style_print",
+    "style_input",
 ]
 
 
@@ -98,3 +104,11 @@ def style_print(*values, **options):
     style = options.pop("style", None)
     values = tuple(style_format(value, style) for value in values)
     print(*values, **options)
+
+
+def style_input(prompt=None, style=None):
+    """ A convenience function that applies style_format before get user input
+    """
+    if style:
+        prompt = style_format(prompt, style)
+    return input(prompt)
