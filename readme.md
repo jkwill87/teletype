@@ -5,7 +5,7 @@
 
 # teletype
 
-**teletype** is a high-level cross platform tty library compatible with Python 2.7 and 3+. It provides a consistent interface between the terminal and cmd.exe by building on top of [terminfo](https://invisible-island.net/ncurses/terminfo.src.html) and [msvcrt](https://msdn.microsoft.com/en-us/library/abx4dbyh.aspx) and has no dependencies.
+**teletype** is a high-level cross platform tty library compatible with Python 3.7+. It provides a consistent interface between the terminal and cmd.exe by building on top of [terminfo](https://invisible-island.net/ncurses/terminfo.src.html) and [msvcrt](https://msdn.microsoft.com/en-us/library/abx4dbyh.aspx) and has no dependencies.
 
 
 # Installation
