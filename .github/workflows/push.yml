@@ -1,0 +1,55 @@
+name: push
+
+on:
+  push:
+
+jobs:
+  lint: # --------------------------------------------------------------------
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checking out Git Commit
+        uses: actions/checkout@v2
+
+      - name: Installing Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Installing requirements
+        run: pip install -r requirements-dev.txt
+
+      - name: Linting black
+        run: black --check teletype
+
+      - name: Linting isort
+        run: isort --check-only teletype
+
+      - name: Linting mypy
+        run: mypy teletype
+
+  publish: # ---------------------------------------------------------------------
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags')
+
+    steps:
+      - name: Checking out Git Commit
+        uses: actions/checkout@v2
+
+      - name: Installing Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Installing Requirements
+        run: pip install -q -U pip -r wheel twine
+
+      - name: Building universal wheel
+        run: python setup.py sdist bdist_wheel --universal
+
+      - name: Uploading to PyPI
+        run: >-
+          twine upload
+          --username jkwill87
+          --password ${{secrets.pypi_password}}
+          dist/*
