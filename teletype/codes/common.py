@@ -1,5 +1,3 @@
-# coding=utf-8
-
 CHARS_ASCII = {
     "arrow": ">",
     "block": "#",

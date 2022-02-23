@@ -1,8 +1,5 @@
-# coding=utf-8
-
-from __future__ import print_function, division
-
 import os
+from typing import Optional
 
 from teletype import codes, io
 
@@ -15,8 +12,8 @@ __all__ = [
 ]
 
 
-class SelectOne(object):
-    """ Allows the user to make a single selection
+class SelectOne:
+    """Allows the user to make a single selection
 
     - Use arrow keys or 'j' and 'k' to highlight selection
     - Press mnemonic keys to move to ChoiceHelper, another time to submit
@@ -55,7 +52,7 @@ class SelectOne(object):
             char = self.chars["selected"]
         else:
             char = self.chars["unselected"]
-        print(char, end="")
+        print(char, end=None)
         io.move_cursor(cols=-2)
 
     def _move_line(self, distance):
@@ -65,9 +62,9 @@ class SelectOne(object):
         if offset == 0:
             return 0
         self._line += offset
-        print(" " * col_offset, end="")
+        print(" " * col_offset, end=None)
         io.move_cursor(rows=offset, cols=-col_offset)
-        print("%s%s" % (" " * (col_offset - 1), g_cursor), end="")
+        print("%s%s" % (" " * (col_offset - 1), g_cursor), end=None)
         io.move_cursor(cols=-col_offset)
         return offset
 
@@ -112,21 +109,18 @@ class SelectOne(object):
 
     @property
     def choices(self):
-        """ Returns read-only tuple of choices
-        """
+        """Returns read-only tuple of choices"""
         return tuple(self._choices)
 
     @property
     def highlighted(self):
-        """ Returns the value for the currently highlighted choice
-        """
+        """Returns the value for the currently highlighted choice"""
         choice = self.choices[self._line % len(self.choices)]
         return self._strip_choice(choice)
 
     @property
     def selected(self):
-        """ Returns the values for all currently selected choices
-        """
+        """Returns the values for all currently selected choices"""
         return tuple(
             self._strip_choice(self.choices[line % len(self.choices)])
             for line in self._selected_lines
@@ -151,8 +145,7 @@ class SelectOne(object):
 
 
 class SelectApproval(SelectOne):
-    """ Simple extension of SelectOne offering the option of selecting yes or no
-    """
+    """Simple extension of SelectOne offering the option of selecting yes or no"""
 
     def __init__(self, **chars):
         yes = ChoiceHelper(True, "yes", None, "y")
@@ -161,7 +154,7 @@ class SelectApproval(SelectOne):
 
 
 class SelectMany(SelectOne):
-    """ Allows users to select multiple items using
+    """Allows users to select multiple items using
 
     - Use arrow keys or 'j' and 'k' to highlight selection
     - Press mnemonic keys to move to ChoiceHelper, another time to toggle
@@ -180,9 +173,8 @@ class SelectMany(SelectOne):
         print(s)
 
 
-class ProgressBar(object):
-    """ Displays a progress bar
-    """
+class ProgressBar:
+    """Displays a progress bar"""
 
     def __init__(self, label, width=None, **chars):
         self.label = label
@@ -191,8 +183,7 @@ class ProgressBar(object):
         self.chars.update(chars)
 
     def process(self, iterable, steps):
-        """ Iterates over an object, updating the progress bar on each iteration
-        """
+        """Iterates over an object, updating the progress bar on each iteration"""
         io.hide_cursor()
         self.update(0, steps)
         skip_count = max(steps // 1000, 1)
@@ -202,8 +193,7 @@ class ProgressBar(object):
         io.show_cursor()
 
     def update(self, step, steps):
-        """ Manually updates the progress bar
-        """
+        """Manually updates the progress bar"""
         try:
             # Python 3.3+ only
             width = self.width or os.get_terminal_size().columns
@@ -221,18 +211,14 @@ class ProgressBar(object):
         units_total = max(width - len(io.strip_format(prefix + suffix)), 5)
         units = units_total * step // steps
         line = (
-            prefix
-            + units * self.chars["block"]
-            + (units_total - units) * " "
-            + suffix
+            prefix + units * self.chars["block"] + (units_total - units) * " " + suffix
         )
         io.erase_lines()
         print("\r%s" % line)
 
 
-class ChoiceHelper(object):
-    """ Helper class for packaging and displaying objects as choices
-    """
+class ChoiceHelper:
+    """Helper class for packaging and displaying objects as choices"""
 
     def __init__(self, value, label=None, style=None, mnemonic=None):
         self._idx = -1
@@ -269,19 +255,17 @@ class ChoiceHelper(object):
         else:
             s = (
                 io.style_format(self._str[: self._idx], self.style)
-                + io.style_format(
-                    self._str[self._idx], "underline " + self.style
-                )
+                + io.style_format(self._str[self._idx], "underline " + self.style)
                 + io.style_format(self._str[self._idx + 1 :], self.style)
             )
         return s
 
     @property
-    def mnemonic(self):
+    def mnemonic(self) -> Optional[str]:
         return self._mnemonic
 
     @mnemonic.setter
-    def mnemonic(self, m):
+    def mnemonic(self, m: Optional[str]):
         if not m:
             self._mnemonic = None
             return
@@ -293,11 +277,11 @@ class ChoiceHelper(object):
         elif line_len == 1:
             self._mnemonic = m
             self._bracketed = False
-            self._idx = self._str.lower().find(self.mnemonic.lower())
+            self._idx = self._str.lower().find(self._mnemonic.lower())
         elif line_len == 3 and m[0] == "[" and m[2] == "]":
             self._mnemonic = m[1]
             self._bracketed = True
-            self._idx = self._str.lower().find(self.mnemonic.lower())
+            self._idx = self._str.lower().find(self._mnemonic.lower())
         else:
             raise ValueError("mnemonic must be None or of form 'x' or '[x]'")
         if self._mnemonic not in (self.label or str(self.value)):

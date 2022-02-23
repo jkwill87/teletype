@@ -2,6 +2,7 @@ __pycache__/
 .coverage
 .DS_Store
 .idea
+.mypy_cache
 .python-version
 .vscode
 *.egg-info/
@@ -11,5 +12,6 @@ __pycache__/
 build
 dist/
 MANIFEST
-venv*
+playground.py
 tags
+venv*

@@ -1,7 +1,3 @@
-# coding=utf-8
-
-from __future__ import print_function
-
 from sys import stdin
 from termios import TCSADRAIN, tcgetattr, tcsetattr
 from tty import setraw
@@ -11,9 +7,8 @@ from teletype import codes
 __all__ = ["get_key"]
 
 
-def get_key(raw=False):
-    """ Gets a single key from stdin
-    """
+def get_key(raw: bool = False) -> str:
+    """Gets a single key from stdin"""
     file_descriptor = stdin.fileno()
     state = tcgetattr(file_descriptor)
     chars = []
@@ -25,9 +20,9 @@ def get_key(raw=False):
             chars.append(char)
             if i == 0 and ordinal != 27:
                 break
-            elif i == 1 and ordinal != 91:
+            if i == 1 and ordinal != 91:
                 break
-            elif i == 2 and ordinal != 51:
+            if i == 2 and ordinal != 51:
                 break
     finally:
         tcsetattr(file_descriptor, TCSADRAIN, state)

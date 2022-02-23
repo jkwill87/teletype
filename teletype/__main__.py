@@ -1,33 +1,24 @@
-# coding=utf-8
-
 """USAGE: python -m teletype [codes|components|io]
 
 This file is only included for testing terminal capabilities. Teletype is
 intended to be imported as a library, not run as a module."""
 
-from __future__ import print_function
 
 from sys import argv
 
 from teletype import codes, components, io
-
-try:
-    input = raw_input
-except NameError:
-    pass
-
 
 # CODES ------------------------------------------------------------------------
 
 
 def demo_codes_chars_ascii():
     for key, value in codes.CHARS_ASCII.items():
-        print(u"'{}' .. {}".format(value, key))
+        print("'{}' .. {}".format(value, key))
 
 
 def demo_codes_chars_default():
     for key, value in codes.CHARS_DEFAULT.items():
-        print(u"'{}' .. {}".format(value, key))
+        print("'{}' .. {}".format(value, key))
 
 
 def demo_codes_colours():
@@ -39,14 +30,14 @@ def demo_codes_colours():
 def demo_codes_highlights():
     RESET = codes.MODES["reset"]
     for key, value in codes.HIGHLIGHTS.items():
-        print(u"{}{}{} .. {}".format(value, "/" * 10, RESET, key))
+        print("{}{}{} .. {}".format(value, "/" * 10, RESET, key))
 
 
 def demo_codes_modes():
     modes_copy = codes.MODES.copy()
     RESET = modes_copy.pop("reset")
     for key, value in modes_copy.items():
-        print(u"{}{}{} .. {}".format(value, "/" * 10, RESET, key))
+        print("{}{}{} .. {}".format(value, "/" * 10, RESET, key))
 
 
 # IO ---------------------------------------------------------------------------
@@ -112,9 +103,7 @@ def demo_components_selectone():
     five = components.ChoiceHelper(5, None, "magenta", "5")
     six = components.ChoiceHelper(6, None, "red", "6")
     seven = components.ChoiceHelper(7, None, "yellow", "7")
-    choice = components.SelectOne(
-        (one, two, three, four, five, six, seven)
-    ).prompt()
+    choice = components.SelectOne((one, two, three, four, five, six, seven)).prompt()
     print("choice = {}\n".format(choice))
 
     print("ChoiceHelper label")
@@ -171,9 +160,7 @@ def demo_components_progressbar():
         io.get_key()
     print()
 
-    progressbar = components.ProgressBar(
-        "ASCII ProgressBar", **codes.CHARS_ASCII
-    )
+    progressbar = components.ProgressBar("ASCII ProgressBar", **codes.CHARS_ASCII)
     for i in range(0, 6):
         progressbar.update(i, 5)
         io.get_key()

@@ -1,16 +1,8 @@
-# coding=utf-8
-
-from __future__ import print_function
-
 from re import sub
 from sys import stdout
+from typing import Any, Collection, Optional, Union
 
 from teletype import codes
-
-try:
-    input = raw_input
-except NameError:
-    pass
 
 __all__ = [
     "erase_lines",
@@ -24,26 +16,26 @@ __all__ = [
     "style_input",
 ]
 
+TSTYLE = Optional[Union[str, Collection[str]]]
 
-def erase_lines(n=1):
-    """ Erases n lines from the screen and moves the cursor up to follow
-    """
+
+def erase_lines(n: int = 1):
+    """Erases n lines from the screen and moves the cursor up to follow"""
     for _ in range(n):
-        print(codes.CURSOR["up"], end="")
-        print(codes.CURSOR["eol"], end="")
+        print(codes.CURSOR["up"], end=None)
+        print(codes.CURSOR["eol"], end=None)
     stdout.flush()
 
 
 def erase_screen():
-    """ Clears all text from the screen
-    """
-    print(codes.CURSOR["clear"], end="")
+    """Clears all text from the screen"""
+    print(codes.CURSOR["clear"], end=None)
     stdout.flush()
 
 
-def move_cursor(cols=0, rows=0):
-    """ Moves the cursor the given number of columns and rows
-    
+def move_cursor(cols: int = 0, rows: int = 0):
+    """Moves the cursor the given number of columns and rows
+
     The cursor is moved right when cols is positive and left when negative.
     The cursor is moved down when rows is positive and down when negative.
     """
@@ -53,32 +45,29 @@ def move_cursor(cols=0, rows=0):
     commands += codes.CURSOR["up" if rows < 0 else "down"] * abs(rows)
     commands += codes.CURSOR["left" if cols < 0 else "right"] * abs(cols)
     if commands:
-        print(commands, end="")
+        print(commands, end=None)
         stdout.flush()
 
 
 def show_cursor():
-    """ Shows the cursor indicator
-    """
-    print(codes.CURSOR["show"], end="")
+    """Shows the cursor indicator"""
+    print(codes.CURSOR["show"], end=None)
     stdout.flush()
 
 
 def hide_cursor():
-    """ Hides the cursor indicator; remember to call show_cursor before exiting
-    """
-    print(codes.CURSOR["hide"], end="")
+    """Hides the cursor indicator; remember to call show_cursor before exiting"""
+    print(codes.CURSOR["hide"], end=None)
     stdout.flush()
 
 
-def strip_format(text):
-    """ Returns text with all control sequences removed
-    """
+def strip_format(text: str) -> str:
+    """Returns text with all control sequences removed"""
     return sub(r"(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]", "", text)
 
 
-def style_format(text, style, reset=True):
-    """ Wraps texts in terminal control sequences
+def style_format(text: str, style: TSTYLE = None, reset: bool = True) -> str:
+    """Wraps texts in terminal control sequences
 
     Style can be passed as either a collection or space delimited string.
     Valid styles can be found in the codes module. Invalid or unsuported styles
@@ -98,17 +87,15 @@ def style_format(text, style, reset=True):
     return prefix + text
 
 
-def style_print(*values, **options):
-    """ A convenience function that applies style_format to text before printing
-    """
+def style_print(*values: Any, **options: Any):
+    """A convenience function that applies style_format to text before printing"""
     style = options.pop("style", None)
     values = tuple(style_format(value, style) for value in values)
     print(*values, **options)
 
 
-def style_input(prompt=None, style=None):
-    """ A convenience function that applies style_format before get user input
-    """
-    if style:
+def style_input(prompt: Optional[str] = None, style: TSTYLE = None) -> str:
+    """A convenience function that applies style_format before get user input"""
+    if prompt and style:
         prompt = style_format(prompt, style)
     return input(prompt)

@@ -1,6 +1,4 @@
-# coding=utf-8
-
-from ctypes import windll
+from ctypes import windll  # type: ignore
 
 __all__ = ["CHARS_DEFAULT", "SCAN_CODES"]
 
@@ -9,12 +7,12 @@ __all__ = ["CHARS_DEFAULT", "SCAN_CODES"]
 windll.kernel32.SetConsoleMode(windll.kernel32.GetStdHandle(-11), 1 | 2 | 4 | 8)
 
 CHARS_DEFAULT = {
-    "arrow": u"►",
-    "block": u"█",
-    "left-edge": u"▐",
-    "right-edge": u"▌",
-    "selected": u"●",
-    "unselected": u"○",
+    "arrow": "►",
+    "block": "█",
+    "left-edge": "▐",
+    "right-edge": "▌",
+    "selected": "●",
+    "unselected": "○",
 }
 
 SCAN_CODES = {

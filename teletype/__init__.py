@@ -1,5 +1,3 @@
-# coding=utf-8
-
 from os import name as os_name
 
 from teletype.__version__ import VERSION

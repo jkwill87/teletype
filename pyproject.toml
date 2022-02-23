@@ -1,3 +1,23 @@
 [tool.black]
-exclude = 'venv/'
-line-length = 80
+line-length = 88
+target-version = ["py37"]
+
+[tool.pyright]
+reportGeneralTypeIssues = "information"
+pythonVersion = "3.7"
+include = ["teletype"]
+exclude = ["playground.py", "venv"]
+venv = ["venv"]
+
+[tool.isort]
+profile = "black"
+py_version = 37
+line_length = 88
+known_first_party = "teletype"
+combine_star = true
+combine_straight_imports = false
+overwrite_in_place = true
+
+[tool.pylint.messages_control]
+max-line-length = 88
+disable = ["C0103", "C0114", "C0116", "C0209", "E0401", "R0801"]
