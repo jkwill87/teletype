@@ -50,6 +50,6 @@ jobs:
       - name: Uploading to PyPI
         run: >-
           twine upload
-          --username jkwill87
+          --username __token__
           --password ${{secrets.pypi_password}}
           dist/*
