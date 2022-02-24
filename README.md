@@ -203,4 +203,4 @@ You can also change character sets using `set_char(key, value)` where value is t
 
 # License
 
-MIT. See license.txt for details.
+MIT. See LICENSE.txt for details.
