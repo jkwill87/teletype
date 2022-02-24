@@ -17,7 +17,7 @@ jobs:
           python-version: 3.7
 
       - name: Installing requirements
-        run: pip install -r requirements-dev.txt
+        run: pip install -e .[ci]
 
       - name: Linting black
         run: black --check teletype
@@ -42,7 +42,7 @@ jobs:
           python-version: 3.7
 
       - name: Installing Requirements
-        run: pip install -q -U pip wheel twine build
+        run: pip install -q -U pip build twine wheel
 
       - name: Building universal wheel
         run: python3 -m build
