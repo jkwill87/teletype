@@ -42,10 +42,10 @@ jobs:
           python-version: 3.7
 
       - name: Installing Requirements
-        run: pip install -q -U pip wheel twine
+        run: pip install -q -U pip wheel twine build
 
       - name: Building universal wheel
-        run: python setup.py sdist bdist_wheel --universal
+        run: python3 -m build
 
       - name: Uploading to PyPI
         run: >-
