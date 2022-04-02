@@ -1,7 +1,8 @@
 import os
-from typing import Any, Iterable, Optional, Tuple, TypeVar, Union, Generic, overload
+from typing import Any, Dict, Generic, Iterable, List, Optional, Set, Tuple, Union
 
 from teletype import codes, io
+from teletype.typing import TSTYLE, V
 
 __all__ = [
     "SelectOne",
@@ -11,9 +12,6 @@ __all__ = [
     "ChoiceHelper",
 ]
 
-StyleParam = Union[str, Iterable[str]]
-V = TypeVar("V")
-
 
 class ChoiceHelper(Generic[V]):
     """Helper class for packaging and displaying objects as choices"""
@@ -22,7 +20,7 @@ class ChoiceHelper(Generic[V]):
         self,
         value: V,
         label: Optional[str] = None,
-        style: Optional[StyleParam] = None,
+        style: TSTYLE = None,
         mnemonic: Optional[str] = None,
     ):
         self._idx = -1
@@ -71,12 +69,12 @@ class ChoiceHelper(Generic[V]):
     @mnemonic.setter
     def mnemonic(self, m: Optional[str]):
         if not m:
-            self._mnemonic = None
+            self._mnemonic = ""
             return
         line_len = len(m) if isinstance(m, str) else 0
         if not line_len:
             self._bracketed = False
-            self._mnemonic = None
+            self._mnemonic = ""
             self._idx = -1
         elif line_len == 1:
             self._mnemonic = m
@@ -92,11 +90,11 @@ class ChoiceHelper(Generic[V]):
             backing_value = self.label
         else:
             backing_value = str(self.value)
-        if self._mnemonic is not None and self._mnemonic not in backing_value:
+        if self._mnemonic and self._mnemonic not in backing_value:
             raise ValueError("mnemonic not present in value or label")
 
 
-ChoiceParam = Iterable[Union[str, int, ChoiceHelper]]
+ChoiceParam = Union[str, int, ChoiceHelper]
 
 
 class SelectOne:
@@ -109,19 +107,19 @@ class SelectOne:
 
     _multiselect = False
 
-    def __init__(self, choices: ChoiceParam, **chars: str):
+    def __init__(self, choices: Iterable[ChoiceParam], **chars: str):
         self.chars = codes.CHARS_DEFAULT.copy()
         self.chars.update(chars)
-        self._mnemonics = {}
-        self._choices = []
+        self._mnemonic_idx_map: Dict[str, int] = {}
+        self._choices: List[ChoiceParam] = []
         for choice in choices:
             if choice in self._choices:
                 continue
             self._choices.append(choice)
             if isinstance(choice, ChoiceHelper) and choice.mnemonic:
-                self._mnemonics[choice.mnemonic] = len(self._mnemonics)
+                self._mnemonic_idx_map[choice.mnemonic] = len(self._mnemonic_idx_map)
         self._line = 0
-        self._selected_lines = set()
+        self._selected_lines: Set[str] = set()
 
     def __len__(self):
         return len(self.choices)
@@ -159,9 +157,9 @@ class SelectOne:
         while True:
             key = io.get_key()
             # navigation key pressed; vim keys allowed when mnemonics not in use
-            if key == "up" or (key == "k" and not self._mnemonics):
+            if key == "up" or (key == "k" and not self._mnemonic_idx_map):
                 self._move_line(-1)
-            elif key == "down" or (key == "j" and not self._mnemonics):
+            elif key == "down" or (key == "j" and not self._mnemonic_idx_map):
                 self._move_line(1)
             # space pressed
             elif self._multiselect and key == "space":
@@ -170,10 +168,10 @@ class SelectOne:
             elif key in ("lf", "nl"):
                 break
             # mnemonic pressed
-            elif self._mnemonics.get(key) is not None:
+            elif self._mnemonic_idx_map.get(key) is not None:
                 choice_count = len(self.choices)
-                mnemonic_count = len(self._mnemonics)
-                mnemonic_idx = self._mnemonics[key]
+                mnemonic_count = len(self._mnemonic_idx_map)
+                mnemonic_idx = self._mnemonic_idx_map[key]
                 dist = choice_count - mnemonic_count - self._line + mnemonic_idx
                 self._move_line(dist)
                 if dist == 0:
@@ -206,10 +204,10 @@ class SelectOne:
         return self._strip_choice(choice)
 
     @property
-    def selected(self) -> Any:
+    def selected(self) -> tuple:
         """Returns the values for all currently selected choices"""
         return tuple(
-            self._strip_choice(self.choices[line % len(self.choices)])
+            self._strip_choice(self.choices[line % len(self.choices)])  # type: ignore
             for line in self._selected_lines
         )
 

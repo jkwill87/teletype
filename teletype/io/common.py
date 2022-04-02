@@ -1,8 +1,9 @@
 from re import sub
 from sys import stdout
-from typing import Any, Collection, Optional, Union
+from typing import Any, Optional
 
 from teletype import codes
+from teletype.typing import TSTYLE
 
 __all__ = [
     "erase_lines",
@@ -15,8 +16,6 @@ __all__ = [
     "style_print",
     "style_input",
 ]
-
-TSTYLE = Optional[Union[str, Collection[str]]]
 
 
 def erase_lines(n: int = 1):
