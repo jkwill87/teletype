@@ -139,7 +139,7 @@ class SelectOne:
             char = self.chars["selected"]
         else:
             char = self.chars["unselected"]
-        print(char, end=None)
+        print(char, end="")
         io.move_cursor(cols=-2)
 
     def _move_line(self, distance: int) -> int:
@@ -149,9 +149,9 @@ class SelectOne:
         if offset == 0:
             return 0
         self._line += offset
-        print(" " * col_offset, end=None)
+        print(" " * col_offset, end="")
         io.move_cursor(rows=offset, cols=-col_offset)
-        print("%s%s" % (" " * (col_offset - 1), g_cursor), end=None)
+        print("%s%s" % (" " * (col_offset - 1), g_cursor), end="")
         io.move_cursor(cols=-col_offset)
         return offset
 

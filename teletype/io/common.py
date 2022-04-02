@@ -22,14 +22,14 @@ TSTYLE = Optional[Union[str, Collection[str]]]
 def erase_lines(n: int = 1):
     """Erases n lines from the screen and moves the cursor up to follow"""
     for _ in range(n):
-        print(codes.CURSOR["up"], end=None)
-        print(codes.CURSOR["eol"], end=None)
+        print(codes.CURSOR["up"], end="")
+        print(codes.CURSOR["eol"], end="")
     stdout.flush()
 
 
 def erase_screen():
     """Clears all text from the screen"""
-    print(codes.CURSOR["clear"], end=None)
+    print(codes.CURSOR["clear"], end="")
     stdout.flush()
 
 
@@ -45,19 +45,19 @@ def move_cursor(cols: int = 0, rows: int = 0):
     commands += codes.CURSOR["up" if rows < 0 else "down"] * abs(rows)
     commands += codes.CURSOR["left" if cols < 0 else "right"] * abs(cols)
     if commands:
-        print(commands, end=None)
+        print(commands, end="")
         stdout.flush()
 
 
 def show_cursor():
     """Shows the cursor indicator"""
-    print(codes.CURSOR["show"], end=None)
+    print(codes.CURSOR["show"], end="")
     stdout.flush()
 
 
 def hide_cursor():
     """Hides the cursor indicator; remember to call show_cursor before exiting"""
-    print(codes.CURSOR["hide"], end=None)
+    print(codes.CURSOR["hide"], end="")
     stdout.flush()
 
 
