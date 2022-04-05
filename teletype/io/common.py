@@ -3,7 +3,7 @@ from sys import stdout
 from typing import Any, Optional
 
 from teletype import codes
-from teletype.typing import TSTYLE
+from teletype.typedef import TSTYLE
 
 __all__ = [
     "erase_lines",

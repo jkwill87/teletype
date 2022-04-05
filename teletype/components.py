@@ -2,7 +2,7 @@ import os
 from typing import Any, Dict, Generic, Iterable, List, Optional, Set, Tuple, Union
 
 from teletype import codes, io
-from teletype.typing import TSTYLE, V
+from teletype.typedef import TSTYLE, V
 
 __all__ = [
     "SelectOne",
@@ -94,9 +94,6 @@ class ChoiceHelper(Generic[V]):
             raise ValueError("mnemonic not present in value or label")
 
 
-ChoiceParam = Union[str, int, ChoiceHelper]
-
-
 class SelectOne:
     """Allows the user to make a single selection
 
@@ -107,11 +104,11 @@ class SelectOne:
 
     _multiselect = False
 
-    def __init__(self, choices: Iterable[ChoiceParam], **chars: str):
+    def __init__(self, choices: Iterable, **chars: str):
         self.chars = codes.CHARS_DEFAULT.copy()
         self.chars.update(chars)
         self._mnemonic_idx_map: Dict[str, int] = {}
-        self._choices: List[ChoiceParam] = []
+        self._choices: List[Any] = []
         for choice in choices:
             if choice in self._choices:
                 continue
@@ -119,7 +116,7 @@ class SelectOne:
             if isinstance(choice, ChoiceHelper) and choice.mnemonic:
                 self._mnemonic_idx_map[choice.mnemonic] = len(self._mnemonic_idx_map)
         self._line = 0
-        self._selected_lines: Set[str] = set()
+        self._selected_lines: Set[int] = set()
 
     def __len__(self):
         return len(self.choices)
@@ -127,7 +124,7 @@ class SelectOne:
     def __hash__(self):
         return self.choices.__hash__()
 
-    def _display_choice(self, idx: int, choice: ChoiceParam):
+    def _display_choice(self, idx: int, choice: Any):
         print(" %s %s" % (self.chars["arrow"] if idx == 0 else " ", choice))
 
     def _select_line(self):
@@ -185,7 +182,7 @@ class SelectOne:
                 raise KeyboardInterrupt("%s pressed" % key)
 
     @staticmethod
-    def _strip_choice(choice: ChoiceParam) -> Any:
+    def _strip_choice(choice: Any) -> Any:
         if isinstance(choice, str):
             return io.strip_format(choice)
         if isinstance(choice, ChoiceHelper):
@@ -193,7 +190,7 @@ class SelectOne:
         return choice
 
     @property
-    def choices(self) -> Tuple[ChoiceParam, ...]:
+    def choices(self) -> Tuple:
         """Returns read-only tuple of choices"""
         return tuple(self._choices)
 
